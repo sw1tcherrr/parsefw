@@ -1,0 +1,30 @@
+digraph {
+0[label=Declaration]
+1[label=Args]
+2[label=Arg]
+3[label=Type]
+4[label=MaybeGeneric]
+4 -> {}
+3 -> {4 }
+2 -> {3 }
+5[label=MaybeArgs]
+6[label=Args]
+7[label=Arg]
+8[label=Type]
+9[label=MaybeGeneric]
+9 -> {}
+8 -> {9 }
+7 -> {8 }
+10[label=MaybeArgs]
+10 -> {}
+6 -> {7 10 }
+5 -> {6 }
+1 -> {2 5 }
+11[label=MaybeReturnType]
+12[label=Type]
+13[label=MaybeGeneric]
+13 -> {}
+12 -> {13 }
+11 -> {12 }
+0 -> {1 11 }
+}

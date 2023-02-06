@@ -1,0 +1,49 @@
+fun Name ( Args ) : Type
+
+Терминалы:
+fun
+(
+)
+<
+>
+:
+,
+identifier = /[a-zA-Z_][\w-]*/
+
+Нетерминалы:
+С устранением правого ветвления:
+
+Declaration -> fun identifier ( Args ) MaybeReturnType
+MaybeReturnType -> : Type
+MaybeReturnType -> eps
+
+Type -> identifier MaybeGeneric
+MaybeGeneric -> < Type >
+MaybeGeneric -> eps
+
+Args -> Arg MaybeArgs
+Args -> eps
+MaybeArgs -> , Args
+MaybeArgs -> eps
+
+Arg -> identifier : Type
+
+FIRST и FOLLOW: (TODO реализовать алгоритм)
+
+FIRST:
+Declaration:            fun
+MaybeReturnType:        : eps
+Type:                   identifier
+MaybeGeneric:           < eps
+Args:                   identifier eps
+MaybeArgs:              , eps
+Arg:                    identifier
+
+FOLLOW:
+Declaration:            $
+MaybeReturnType:        $
+Type:                   $ > , )
+MaybeGeneric:           $ > , )
+Args:                   )
+MaybeArgs:              )
+Arg:                    , )
