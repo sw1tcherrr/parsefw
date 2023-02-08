@@ -9,7 +9,7 @@ template <std::input_iterator I>
 struct parser : parsefw::parser_base<I> {
     parser(I begin, I end) : base(std::move(begin), std::move(end)) {}
 
-    using Node = AST::lang_node;
+    using Node = AST::node;
     std::optional<Node> parse() {
         next_token();
         return Declaration();
@@ -19,17 +19,26 @@ private:
     using base = parsefw::parser_base<I>;
     using base::next_token, base::expect_eof, base::expect_simple, base::expect_id, base::expect_keyword;
     using nt_node = parsefw::AST::nonterminal_node<Node>;
+    using t_node = parsefw::AST::token_node;
+
+    void add_token_child(nt_node& n) {
+        n.add_child(Node{t_node{this->cur_token}});
+    }
 
     std::optional<Node> Declaration() {
         nt_node res{"Declaration"};
         PFW_TRY(expect_keyword("fun"))
+        add_token_child(res);
         next_token();
         PFW_TRY(expect_id())
+        add_token_child(res);
         next_token();
         PFW_TRY(expect_simple(LPAREN))
+        add_token_child(res);
         next_token();
         PFW_TRY(res.add_child(Args()))
         PFW_TRY(expect_simple(RPAREN))
+        add_token_child(res);
         next_token();
         PFW_TRY(res.add_child(MaybeReturnType()))
         return {Node(std::move(res))};
@@ -53,8 +62,10 @@ private:
     std::optional<Node> Arg() {
         nt_node res{"Arg"};
         PFW_TRY(expect_id())
+        add_token_child(res);
         next_token();
         PFW_TRY(expect_simple(COLON))
+        add_token_child(res);
         next_token();
         PFW_TRY(res.add_child(Type()))
         return {Node(std::move(res))};
@@ -63,6 +74,7 @@ private:
     std::optional<Node> Type() {
         nt_node res{"Type"};
         PFW_TRY(expect_id())
+        add_token_child(res);
         next_token();
         PFW_TRY(res.add_child(MaybeGeneric()))
         return {Node(std::move(res))};
@@ -72,9 +84,11 @@ private:
         if (expect_simple(LANGLE)) {
             nt_node res{"MaybeGeneric"};
             std::cout << "MaybeGeneric -> < Type >\n";
+            add_token_child(res);
             next_token();
             PFW_TRY(res.add_child(Type()))
             PFW_TRY(expect_simple(RANGLE))
+            add_token_child(res);
             next_token();
             return {Node(std::move(res))};
         }
@@ -89,6 +103,7 @@ private:
         if (expect_simple(COMMA)) {
             nt_node res{"MaybeArgs"};
             std::cout << "MaybeArgs -> , Args\n";
+            add_token_child(res);
             next_token();
             PFW_TRY(res.add_child(Args()))
             return {Node(std::move(res))};
@@ -104,6 +119,7 @@ private:
         if (expect_simple(COLON)) {
             nt_node res{"MaybeReturnType"};
             std::cout << "MaybeReturnType -> : Type\n";
+            add_token_child(res);
             next_token();
             PFW_TRY(res.add_child(Type()))
             return {Node(std::move(res))};

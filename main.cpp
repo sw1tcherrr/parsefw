@@ -8,7 +8,7 @@ int main() {
     using namespace language::kotlin_func;
     using namespace parsefw;
 
-    std::string test = "fun funCtion(a: Int, b: Int)  : Unit";
+    std::string test = "fun funCtion(a: Array<List<Int>>, b: Double)  : Set<Map<K>>";
     std::cout << test << "\n";
 
 //    lexer lex(test.begin(), test.end());
@@ -31,4 +31,12 @@ int main() {
     auto ast = p.parse().value();
     auto out = std::ofstream("../ast.dot");
     parsefw::graphviz::AST_to_DOT(out, ast);
+
+    std::cout << "\n";
+
+    std::ifstream f("../test.txt");
+    parser p2(std::istreambuf_iterator<char>{f}, std::istreambuf_iterator<char>{});
+    auto ast2 = p2.parse().value();
+    auto out2 = std::ofstream("../ast2.dot");
+    parsefw::graphviz::AST_to_DOT(out2, ast2);
 }
