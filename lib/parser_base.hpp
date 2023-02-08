@@ -8,6 +8,9 @@ template<std::input_iterator I>
 struct parser_base {
     parser_base(I begin, I end) : lex(std::move(begin), std::move(end)) {}
 
+    parser_base(parser_base const&) = delete;
+    parser_base& operator=(parser_base const&) = delete;
+
 protected:
     lexer<I> lex;
     token cur_token;

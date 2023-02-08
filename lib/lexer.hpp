@@ -16,6 +16,9 @@ template<std::input_iterator I>
 struct lexer {
     lexer(I begin, I end) : iter(std::move(begin)), end(std::move(end)) {}
 
+    lexer(lexer const&) = delete;
+    lexer& operator=(lexer const&) = delete;
+
     token next_token() {
         using util::operator|;
         skip_spaces();

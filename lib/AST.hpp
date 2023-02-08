@@ -37,12 +37,7 @@ private:
 template <typename LangNode>
 struct nonterminal_node {
     nonterminal_node() = delete;
-    nonterminal_node(nonterminal_node const&) = delete;
-    nonterminal_node& operator=(nonterminal_node const&) = delete;
-
     explicit nonterminal_node(std::string name) : name(std::move(name)) {}
-    nonterminal_node(nonterminal_node&&) noexcept = default;
-    nonterminal_node& operator=(nonterminal_node&&) noexcept = default;
 
     [[nodiscard]]
     bool is_terminal() const {

@@ -1,14 +1,15 @@
 #pragma once
 
 #include<optional>
+#include <functional>
 
 namespace parsefw::util {
 
 // or_else for std::optional
 
 template<typename T, typename F>
-T operator|(std::optional<T> opt, F &&func) {
-    return opt ? *opt : func();
+T operator|(std::optional<T> opt, F&& func) {
+    return opt ? *opt : std::invoke(std::forward<F>(func));
 }
 
 // helper for visiting
