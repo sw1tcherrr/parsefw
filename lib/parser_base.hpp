@@ -17,23 +17,21 @@ protected:
     }
 
     bool expect_eof() {
-        auto e = std::get_if<eof>(&cur_token);
-        return e;
+        return std::holds_alternative<tokens::eof>(cur_token);
     }
 
     bool expect_simple(simple expected) {
-        auto s = std::get_if<simple>(&cur_token);
+        auto s = std::get_if<tokens::simple>(&cur_token);
         return s && *s == expected;
     }
 
     bool expect_keyword(std::string const &name) {
-        auto k = std::get_if<keyword>(&cur_token);
+        auto k = std::get_if<tokens::keyword>(&cur_token);
         return k && k->name == name;
     }
 
     bool expect_id() {
-        auto i = std::get_if<id>(&cur_token);
-        return i;
+        return std::holds_alternative<tokens::id>(cur_token);
     }
 };
 
