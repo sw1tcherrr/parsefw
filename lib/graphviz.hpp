@@ -13,7 +13,7 @@ struct graphviz_node {
 
     void print_attributes(std::ostream& os) const {
         os << id << "[";
-        os << "label=" << self().label();
+        os << "label=\"" << self().label() << "\"";
         if (self().is_terminal()) {
             os << " color=red";
         }
