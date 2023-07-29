@@ -2,13 +2,13 @@
 
 #include <vector>
 #include <ostream>
-#include "token.hpp"
+#include "token_base.hpp"
 
 namespace parsefw::AST {
-using namespace tokens;
 
+template <typename Token>
 struct token_node {
-    explicit token_node(tokens::token tok) : tok(std::move(tok)) {}
+    explicit token_node(Token tok) : tok(std::move(tok)) {}
 
     [[nodiscard]]
     bool is_terminal() const {
@@ -17,12 +17,13 @@ struct token_node {
 
     [[nodiscard]]
     std::string label() const {
-        return std::visit(util::overloaded {
+        return /*std::visit(util::overloaded {
                 [](eof) -> std::string { return "EOF"; },
                 [](simple s) -> std::string { return {(char)s}; },
                 [](keyword const& k) { return "keyword\\n" + k.name; },
                 [](id const& i) { return "identifier\\n" + i.name; }
-            }, tok);
+            }, tok);*/
+        "aboba";
     }
 
     template<class T>
@@ -31,7 +32,7 @@ struct token_node {
     }
 
 private:
-    tokens::token tok;
+    Token tok;
 };
 
 template <typename LangNode>

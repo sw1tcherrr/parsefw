@@ -1,10 +1,11 @@
 #pragma once
 
-#include "lexer.hpp"
+#include <variant>
+#include "lexer_base.hpp"
 
 namespace parsefw {
 
-template<std::input_iterator I>
+template<std::bidirectional_iterator I, typename Lexer, typename Token>
 struct parser_base {
     parser_base(I begin, I end) : lex(std::move(begin), std::move(end)) {}
 
@@ -12,29 +13,22 @@ struct parser_base {
     parser_base& operator=(parser_base const&) = delete;
 
 protected:
-    lexer<I> lex;
-    token cur_token;
+    Token cur_token;
+    Lexer lex;
 
     void next_token() {
         cur_token = lex.next_token();
     }
 
-    bool expect_eof() {
-        return std::holds_alternative<tokens::eof>(cur_token);
+    template <typename T>
+    bool expect() {
+        return std::holds_alternative<T>(cur_token);
     }
 
-    bool expect_simple(simple expected) {
-        auto s = std::get_if<tokens::simple>(&cur_token);
-        return s && *s == expected;
-    }
-
-    bool expect_keyword(std::string const &name) {
-        auto k = std::get_if<tokens::keyword>(&cur_token);
-        return k && k->name == name;
-    }
-
-    bool expect_id() {
-        return std::holds_alternative<tokens::id>(cur_token);
+    template <typename T, std::predicate<T> P>
+    bool expect(P&& p) {
+        auto t = std::get_if<T>(&cur_token);
+        return t && std::invoke(std::forward<P>(p), *t);
     }
 };
 
