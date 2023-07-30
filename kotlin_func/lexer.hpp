@@ -46,8 +46,8 @@ struct Lexer : pfw::LexerBase<I> {
 
         iter = start_pos;
 
-        std::string ex_str = std::visit([](auto const& t) { return pfw::token::GetStringValue(t); }, exact_res);
-        std::string var_str = std::visit([](auto const& t) { return pfw::token::GetStringValue(t); }, variable_res);
+        auto ex_str = std::visit([](auto const& t) { return pfw::token::GetStringValue(t); }, exact_res);
+        auto var_str = std::visit([](auto const& t) { return pfw::token::GetStringValue(t); }, variable_res);
         if (ex_str.size() >= var_str.size()) {
             Base::Consume(ex_str.size());
             return exact_res;

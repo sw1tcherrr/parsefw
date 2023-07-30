@@ -24,22 +24,16 @@ struct String {
     std::string string_value;
 };
 
-struct Exact : String {};
-
-template <std::derived_from<Exact> Token>
-std::string GetStringValue(Token const& t) {
-    //    return std::string(Token::pattern);
+template <std::derived_from<String> Token>
+std::string_view GetStringValue(Token const& t) {
     return t.string_value;
 }
+
+struct Exact : String {};
 
 struct Variable : String {};
 
-template <std::derived_from<Variable> Token>
-std::string GetStringValue(Token const& t) {
-    return t.string_value;
-}
-
-std::string GetStringValue(Eof const& t) {
+std::string_view GetStringValue(Eof const& t) {
     return "";
 }
 

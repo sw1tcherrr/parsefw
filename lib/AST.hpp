@@ -19,13 +19,7 @@ struct TokenNode {
 
     [[nodiscard]]
     std::string Label() const {
-        return /*std::visit(util::overloaded {
-                [](eof) -> std::string { return "EOF"; },
-                [](simple s) -> std::string { return {(char)s}; },
-                [](keyword const& k) { return "keyword\\n" + k.name; },
-                [](id const& i) { return "identifier\\n" + i.name; }
-            }, tok);*/
-            "aboba";
+        return std::string(std::visit([](auto const& t) { return pfw::token::GetStringValue(t); }, m_tok));
     }
 
     template <typename T>
@@ -92,6 +86,8 @@ struct LangNodeBase {
 
     // Pre: this LangNode is non-terminal node
     [[nodiscard]]
+    // todo: span instead of vector?
+    // todo: make Children() function both in TokenNode and NonterminalNode?
     std::vector<LangNode> const& Children() const {
         auto* nt = AsNtNode();
         assert(nt);
