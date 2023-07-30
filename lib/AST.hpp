@@ -4,19 +4,19 @@
 #include <ostream>
 #include "token_base.hpp"
 
-namespace parsefw::AST {
+namespace pfw::ast {
 
 template <typename Token>
-struct token_node {
-    explicit token_node(Token tok) : tok(std::move(tok)) {}
+struct TokenNode {
+    explicit TokenNode(Token tok) : m_tok(std::move(tok)) {}
 
     [[nodiscard]]
-    bool is_terminal() const {
+    bool IsTerminal() const {
         return true;
     }
 
     [[nodiscard]]
-    std::string label() const {
+    std::string Label() const {
         return /*std::visit(util::overloaded {
                 [](eof) -> std::string { return "EOF"; },
                 [](simple s) -> std::string { return {(char)s}; },
@@ -27,79 +27,79 @@ struct token_node {
     }
 
     template<class T>
-    std::vector<T> const& children() const {
+    std::vector<T> const& Children() const {
         return {};
     }
 
 private:
-    Token tok;
+    Token m_tok;
 };
 
 template <typename LangNode>
-struct nonterminal_node {
-    nonterminal_node() = delete;
-    explicit nonterminal_node(std::string name) : name(std::move(name)) {}
+struct NonterminalNode {
+    NonterminalNode() = delete;
+    explicit NonterminalNode(std::string name) : m_name(std::move(name)) {}
 
     [[nodiscard]]
-    bool is_terminal() const {
+    bool IsTerminal() const {
         return false;
     }
 
     [[nodiscard]]
-    std::string label() const noexcept {
-        return name;
+    std::string Label() const noexcept {
+        return m_name;
     }
 
-    bool add_child(std::optional<LangNode>&& maybe_child) {
+    bool AddChild(std::optional<LangNode>&& maybe_child) {
         if (!maybe_child) { return false; }
-        children.push_back(std::move(*maybe_child));
+        m_children.push_back(std::move(*maybe_child));
         return true;
     }
 
-    bool add_child(LangNode&& child) {
-        children.push_back(std::move(child));
+    bool AddChild(LangNode&& child) {
+        m_children.push_back(std::move(child));
         return true;
     }
 
 private:
     template <typename LNode, typename... Nodes>
-    friend struct lang_node_base;
+    friend struct LangNodeBase;
 
-    std::string name;
-    std::vector<LangNode> children{};
+    std::string m_name;
+    std::vector<LangNode> m_children{};
 };
 
 template <typename LangNode, typename... Nodes>
-struct lang_node_base {
+struct LangNodeBase {
     template <typename Node>
-    explicit lang_node_base(Node n) : value(std::move(n)) {}
+    explicit LangNodeBase(Node n) : value(std::move(n)) {}
 
     [[nodiscard]]
-    bool is_terminal() const {
-        return std::visit([](auto&& v) {return v.is_terminal(); }, value);
+    bool IsTerminal() const {
+        return std::visit([](auto&& v) {return v.IsTerminal(); }, value);
     }
 
     [[nodiscard]]
-    std::string label() const {
+    std::string Label() const {
         return std::visit([](auto &&v) {
-            return v.label();
+            return v.Label();
         }, value);
     }
 
     // Pre: this LangNode is non-terminal node
     [[nodiscard]]
-    std::vector<LangNode> const& children() const {
-        auto* nt = as_nt_node();
+    std::vector<LangNode> const& Children() const {
+        auto* nt = AsNtNode();
         assert(nt);
-        return nt->children;
+        return nt->m_children;
     }
 
 protected:
-    using nt_node = nonterminal_node<LangNode>;
+    using NtNode = NonterminalNode<LangNode>;
     [[nodiscard]]
-    nt_node const* as_nt_node() const {
-        return std::visit([]<typename T>(T const& v) -> nt_node const*{
-            if constexpr (std::is_base_of_v<nt_node, T>) {
+    NtNode const* AsNtNode() const {
+        return std::visit([]<typename T>(T const& v) -> NtNode const*{
+            if constexpr (std::is_base_of_v<NtNode, T>) {
                 return &v;
             } else {
                 return nullptr;

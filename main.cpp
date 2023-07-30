@@ -8,14 +8,14 @@
 
 int main() {
     using namespace language::kotlin_func;
-    using namespace parsefw;
+    using namespace pfw;
 
     std::string test = "fun funCtion(a: Array<List<Int>>, b: Double)  : Set<Map<K>>";
     std::cout << test << "\n";
 
-    lexer lex(test.begin(), test.end());
+    Lexer lex(test.begin(), test.end());
     while (true) {
-        auto tok = lex.next_token();
+        Token tok = lex.NextToken();
         std::cout << tok;
         if (tok.index() == 0) { break; }
     }
@@ -31,10 +31,10 @@ int main() {
     }
 */
 
-    parser p(test.begin(), test.end());
-    auto ast = p.parse().value();
+    Parser p(test.begin(), test.end());
+    auto ast = p.Parse().value();
     auto out = std::ofstream("../ast.dot");
-    parsefw::graphviz::AST_to_DOT(out, ast);
+    pfw::graphviz::AstToDot(out, ast);
 
 
     // todo wrap input iterator of fstream to make bidirectional iterator

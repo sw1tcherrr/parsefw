@@ -8,18 +8,18 @@
 
 namespace language::kotlin_func {
 
-using namespace parsefw;
+using namespace pfw;
 
 template<std::bidirectional_iterator I>
-struct lexer : parsefw::lexer_base<I> {
-    using base = parsefw::lexer_base<I>;
+struct Lexer : pfw::LexerBase<I> {
+    using Base = pfw::LexerBase<I>;
 
-    lexer(I begin, I end) : base(std::move(begin), std::move(end)) {}
+    Lexer(I begin, I end) : Base(std::move(begin), std::move(end)) {}
 
-    token next_token() {
+    Token NextToken() {
         using util::operator>;
         using util::operator>=;
-        base::skip([](unsigned char c) { return std::isspace(c); } );
+        Base::Skip([](unsigned char c) { return std::isspace(c); } );
 
         // бывают exact и regex
         // exact между собой отсортированы по длине по убыванию
@@ -30,34 +30,34 @@ struct lexer : parsefw::lexer_base<I> {
 
         auto start_pos = iter;
 
-        auto exact_res = parse<FUN>()
-                         > std::bind(&lexer<I>::parse<LPAREN>, this) // мб замена лямбде, но все равно многословно => в макросе
-                         > PFW_LAZY(parse<RPAREN>)
-                         > PFW_LAZY(parse<LANGLE>)
-                         > PFW_LAZY(parse<RANGLE>)
-                         > PFW_LAZY(parse<COLON>)
-                         > PFW_LAZY(parse<COMMA>)
-                         >= [] { return token{eof{}}; };
+        auto exact_res = Parse<FUN>()
+                         > PFW_LAZY(Parse<LPAREN>)
+                         > PFW_LAZY(Parse<RPAREN>)
+                         > PFW_LAZY(Parse<LANGLE>)
+                         > PFW_LAZY(Parse<RANGLE>)
+                         > PFW_LAZY(Parse<COLON>)
+                         > PFW_LAZY(Parse<COMMA>)
+                         >= [] { return Token{Eof{}}; };
 
         iter = start_pos;
 
-        auto variable_res = parse<ID>() >= [] {return token{eof{}}; };
+        auto variable_res = Parse<ID>() >= [] {return Token{Eof{}}; };
 
         iter = start_pos;
 
-        std::string ex_str = std::visit([] (auto const& t){ return parsefw::token::get_string_value(t); }, exact_res);
-        std::string var_str = std::visit([] (auto const& t){ return parsefw::token::get_string_value(t); }, variable_res);
+        std::string ex_str = std::visit([] (auto const& t){ return pfw::token::GetStringValue(t); }, exact_res);
+        std::string var_str = std::visit([] (auto const& t){ return pfw::token::GetStringValue(t); }, variable_res);
         if (ex_str.size() >= var_str.size()) {
-            base::consume(ex_str.size());
+            Base::Consume(ex_str.size());
             return exact_res;
         } else {
-            base::consume(var_str.size());
+            Base::Consume(var_str.size());
             return variable_res;
         }
     }
 
 private:
-    using base::iter, base::end;
+    using Base::iter, Base::end;
 
 //    template <std::derived_from<parsefw::token::exact> Token>
 //    std::optional<token> parse() {
@@ -72,15 +72,15 @@ private:
 //        return {};
 //    }
 
-    template <std::derived_from<parsefw::token::string> Token>
-    std::optional<token> parse() {
-        std::regex pattern(Token::pattern.data());
+    template <std::derived_from<pfw::token::String> T>
+    std::optional<Token> Parse() {
+        std::regex pattern(T::kPattern.data());
         std::match_results<I> m;
         std::regex_search(iter, end, m, pattern, std::regex_constants::match_continuous);
         if (!m.empty()) {
-            Token res{std::string(m[0].first, m[0].second)}; // todo понятнее
-            base::consume(m[0].second - m[0].first);
-            return {token{std::move(res)}};
+            T res{std::string(m[0].first, m[0].second)}; // todo понятнее
+            Base::Consume(m[0].second - m[0].first);
+            return {Token{std::move(res)}};
         }
         return {};
     }

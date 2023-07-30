@@ -3,30 +3,30 @@
 #include <variant>
 #include "lexer_base.hpp"
 
-namespace parsefw {
+namespace pfw {
 
 template<std::bidirectional_iterator I, typename Lexer, typename Token>
-struct parser_base {
-    parser_base(I begin, I end) : lex(std::move(begin), std::move(end)) {}
+struct ParserBase {
+    ParserBase(I begin, I end) : lex(std::move(begin), std::move(end)) {}
 
-    parser_base(parser_base const&) = delete;
-    parser_base& operator=(parser_base const&) = delete;
+    ParserBase(ParserBase const&) = delete;
+    ParserBase& operator=(ParserBase const&) = delete;
 
 protected:
     Token cur_token;
     Lexer lex;
 
-    void next_token() {
-        cur_token = lex.next_token();
+    void NextToken() {
+        cur_token = lex.NextToken();
     }
 
     template <typename T>
-    bool expect() {
+    bool Expect() {
         return std::holds_alternative<T>(cur_token);
     }
 
     template <typename T, std::predicate<T> P>
-    bool expect(P&& p) {
+    bool Expect(P&& p) {
         auto t = std::get_if<T>(&cur_token);
         return t && std::invoke(std::forward<P>(p), *t);
     }

@@ -8,127 +8,127 @@
 namespace language::kotlin_func {
 
 template <std::bidirectional_iterator I>
-struct parser : parsefw::parser_base<I, lexer<I>, token> {
-    parser(I begin, I end) : base(std::move(begin), std::move(end)) {}
+struct Parser : pfw::ParserBase<I, Lexer<I>, Token> {
+    Parser(I begin, I end) : Base(std::move(begin), std::move(end)) {}
 
-    using Node = AST::node;
-    std::optional<Node> parse() {
-        next_token();
+    using Node = ast::Node;
+    std::optional<Node> Parse() {
+        NextToken();
         return Declaration();
     }
 
 private:
-    using base = parsefw::parser_base<I, lexer<I>, token>;
-    using base::next_token, base::expect;
-    using nt_node = parsefw::AST::nonterminal_node<Node>;
-    using t_node = parsefw::AST::token_node<token>;
+    using Base = pfw::ParserBase<I, Lexer<I>, Token>;
+    using Base::NextToken, Base::Expect;
+    using NtNode = pfw::ast::NonterminalNode<Node>;
+    using TNode = pfw::ast::TokenNode<Token>;
 
-    void add_token_child(nt_node& n) {
-        n.add_child(Node{t_node{this->cur_token}});
+    void AddTokenChild(NtNode& n) {
+        n.AddChild(Node{TNode{this->cur_token}});
     }
 
     std::optional<Node> Declaration() {
-        nt_node res{"Declaration"};
-        PFW_TRY(this->template expect<FUN>())
-        add_token_child(res);
-        next_token();
-        PFW_TRY(this->template expect<ID>())
-        add_token_child(res);
-        next_token();
-        PFW_TRY(this->template expect<LPAREN>())
-        add_token_child(res);
-        next_token();
-        PFW_TRY(res.add_child(Args()))
-        PFW_TRY(this->template expect<RPAREN>())
-        add_token_child(res);
-        next_token();
-        PFW_TRY(res.add_child(MaybeReturnType()))
+        NtNode res{"Declaration"};
+        PFW_TRY(this->template Expect<FUN>())
+        AddTokenChild(res);
+        NextToken();
+        PFW_TRY(this->template Expect<ID>())
+        AddTokenChild(res);
+        NextToken();
+        PFW_TRY(this->template Expect<LPAREN>())
+        AddTokenChild(res);
+        NextToken();
+        PFW_TRY(res.AddChild(Args()))
+        PFW_TRY(this->template Expect<RPAREN>())
+        AddTokenChild(res);
+        NextToken();
+        PFW_TRY(res.AddChild(MaybeReturnType()))
         return {Node(std::move(res))};
     }
 
     std::optional<Node> Args() {
-        if (this->template expect<ID>()) {
-            nt_node res{"Args"};
+        if (this->template Expect<ID>()) {
+            NtNode res{"Args"};
             std::cout << "Args -> Arg MaybeArgs\n";
-            PFW_TRY(res.add_child(Arg()))
-            PFW_TRY(res.add_child(MaybeArgs()))
+            PFW_TRY(res.AddChild(Arg()))
+            PFW_TRY(res.AddChild(MaybeArgs()))
             return {Node(std::move(res))};
         }
-        if (this->template expect<RPAREN>()) {
+        if (this->template Expect<RPAREN>()) {
             std::cout << "Args -> eps\n";
-            return {Node(nt_node{"Args"})};
+            return {Node(NtNode{"Args"})};
         }
         return std::nullopt;
     }
 
     std::optional<Node> Arg() {
-        nt_node res{"Arg"};
-        PFW_TRY(this->template expect<ID>())
-        add_token_child(res);
-        next_token();
-        PFW_TRY(this->template expect<COLON>())
-        add_token_child(res);
-        next_token();
-        PFW_TRY(res.add_child(Type()))
+        NtNode res{"Arg"};
+        PFW_TRY(this->template Expect<ID>())
+        AddTokenChild(res);
+        NextToken();
+        PFW_TRY(this->template Expect<COLON>())
+        AddTokenChild(res);
+        NextToken();
+        PFW_TRY(res.AddChild(Type()))
         return {Node(std::move(res))};
     }
 
     std::optional<Node> Type() {
-        nt_node res{"Type"};
-        PFW_TRY(this->template expect<ID>())
-        add_token_child(res);
-        next_token();
-        PFW_TRY(res.add_child(MaybeGeneric()))
+        NtNode res{"Type"};
+        PFW_TRY(this->template Expect<ID>())
+        AddTokenChild(res);
+        NextToken();
+        PFW_TRY(res.AddChild(MaybeGeneric()))
         return {Node(std::move(res))};
     }
 
     std::optional<Node> MaybeGeneric() {
-        if (this->template expect<LANGLE>()) {
-            nt_node res{"MaybeGeneric"};
+        if (this->template Expect<LANGLE>()) {
+            NtNode res{"MaybeGeneric"};
             std::cout << "MaybeGeneric -> < Type >\n";
-            add_token_child(res);
-            next_token();
-            PFW_TRY(res.add_child(Type()))
-            PFW_TRY(this->template expect<RANGLE>())
-            add_token_child(res);
-            next_token();
+            AddTokenChild(res);
+            NextToken();
+            PFW_TRY(res.AddChild(Type()))
+            PFW_TRY(this->template Expect<RANGLE>())
+            AddTokenChild(res);
+            NextToken();
             return {Node(std::move(res))};
         }
-        if (this->template expect<parsefw::eof>() || this->template expect<RANGLE>() || this->template expect<COMMA>() || this->template expect<RPAREN>()) {
+        if (this->template Expect<pfw::Eof>() || this->template Expect<RANGLE>() || this->template Expect<COMMA>() || this->template Expect<RPAREN>()) {
             std::cout << "MaybeGeneric -> eps\n";
-            return {Node(nt_node{"MaybeGeneric"})};
+            return {Node(NtNode{"MaybeGeneric"})};
         }
         return std::nullopt;
     }
 
     std::optional<Node> MaybeArgs() {
-        if (this->template expect<COMMA>()) {
-            nt_node res{"MaybeArgs"};
+        if (this->template Expect<COMMA>()) {
+            NtNode res{"MaybeArgs"};
             std::cout << "MaybeArgs -> , Args\n";
-            add_token_child(res);
-            next_token();
-            PFW_TRY(res.add_child(Args()))
+            AddTokenChild(res);
+            NextToken();
+            PFW_TRY(res.AddChild(Args()))
             return {Node(std::move(res))};
         }
-        if (this->template expect<RPAREN>()) {
+        if (this->template Expect<RPAREN>()) {
             std::cout << "MaybeArgs -> eps\n";
-            return {Node(nt_node{"MaybeArgs"})};
+            return {Node(NtNode{"MaybeArgs"})};
         }
         return std::nullopt;
     }
 
     std::optional<Node> MaybeReturnType() {
-        if (this->template expect<COLON>()) {
-            nt_node res{"MaybeReturnType"};
+        if (this->template Expect<COLON>()) {
+            NtNode res{"MaybeReturnType"};
             std::cout << "MaybeReturnType -> : Type\n";
-            add_token_child(res);
-            next_token();
-            PFW_TRY(res.add_child(Type()))
+            AddTokenChild(res);
+            NextToken();
+            PFW_TRY(res.AddChild(Type()))
             return {Node(std::move(res))};
         }
-        if (this->template expect<parsefw::eof>()) {
+        if (this->template Expect<pfw::Eof>()) {
             std::cout << "MaybeReturnType -> eps\n";
-            return {Node(nt_node{"MaybeReturnType"})};
+            return {Node(NtNode{"MaybeReturnType"})};
         }
         return std::nullopt;
     }

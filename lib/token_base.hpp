@@ -3,45 +3,45 @@
 #include <string>
 #include <concepts>
 
-namespace parsefw {
-    struct eof {};
+namespace pfw {
+    struct Eof {};
 }
 
-namespace parsefw::token {
+namespace pfw::token {
 
 template <typename T> requires std::integral<T> || std::floating_point<T>
-struct numeric {
+struct Numeric {
     T numeric_value;
 };
 
-template <typename T, std::derived_from<numeric<T>> Token>
-T get_numeric_value(Token const& t) {
+template <typename T, std::derived_from<Numeric<T>> Token>
+T GetNumericValue(Token const& t) {
     return t.numeric_value;
 }
 
-struct string {
+struct String {
     std::string string_value;
 };
 
-struct exact : string {};
+struct Exact : String {};
 
-template <std::derived_from<exact> Token>
-std::string get_string_value(Token const& t) {
+template <std::derived_from<Exact> Token>
+std::string GetStringValue(Token const& t) {
 //    return std::string(Token::pattern);
     return t.string_value;
 }
 
-struct variable : string {};
+struct Variable : String {};
 
-template <std::derived_from<variable> Token>
-std::string get_string_value(Token const& t) {
+template <std::derived_from<Variable> Token>
+std::string GetStringValue(Token const& t) {
     return t.string_value;
 }
 
-std::string get_string_value(eof const& t) {
+std::string GetStringValue(Eof const& t) {
     return "";
 }
 
-#define PFW_MAKE_TOKEN_TYPE(...) std::variant<parsefw::eof, __VA_ARGS__>
+#define PFW_MAKE_TOKEN_TYPE(...) std::variant<pfw::Eof, __VA_ARGS__>
 
 } // namespace parsefw::token

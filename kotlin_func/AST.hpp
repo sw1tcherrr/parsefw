@@ -6,14 +6,14 @@
 #include "../lib/graphviz.hpp"
 #include "token.hpp"
 
-namespace language::kotlin_func::AST {
-using namespace parsefw::AST;
+namespace language::kotlin_func::ast {
+using namespace pfw::ast;
 
-struct node;
-using base = lang_node_base<node, token_node<token>, nonterminal_node<node>>;
+struct Node;
+using Base = LangNodeBase<Node, TokenNode<Token>, NonterminalNode<Node>>;
 
-struct node : base, parsefw::graphviz::graphviz_node<node> {
-    using base::base;
+struct Node : Base, pfw::graphviz::GraphvizNode<Node> {
+    using Base::LangNodeBase;
 };
 
 }

@@ -7,47 +7,47 @@
 #include "token_base.hpp"
 #include "util.hpp"
 
-namespace parsefw {
+namespace pfw {
 
 template<std::bidirectional_iterator I>
-struct lexer_base {
-    using value_type = std::iterator_traits<I>::value_type;
+struct LexerBase {
+    using ValueType = typename std::iterator_traits<I>::value_type;
 
-    lexer_base(I begin, I end) : iter(std::move(begin)), end(std::move(end)) {}
+    LexerBase(I begin, I end) : iter(std::move(begin)), end(std::move(end)) {}
 
-    lexer_base(lexer_base const&) = delete;
-    lexer_base& operator=(lexer_base const&) = delete;
+    LexerBase(LexerBase const&) = delete;
+    LexerBase& operator=(LexerBase const&) = delete;
 
 protected:
     I iter;
     I end;
 
-    template <std::predicate<value_type> P>
-    void skip(P&& p) {
-        while (expect(std::forward<P>(p))) {
-            consume();
+    template <std::predicate<std::_Bit_const_iterator::value_type> P>
+    void Skip(P&& p) {
+        while (Expect(std::forward<P>(p))) {
+            Consume();
         }
     }
 
-    bool expect(value_type c) {
-        return c == peek();
+    ValueType Expect(ValueType c) {
+        return c == Peek();
     }
 
-    template<std::predicate<value_type> P>
-    bool expect(P&& p) {
-        return std::invoke(std::forward<P>(p), peek());
+    template<std::predicate<std::_Bit_const_iterator::value_type> P>
+    bool Expect(P&& p) {
+        return std::invoke(std::forward<P>(p), Peek());
     }
 
-    value_type peek() {
+    ValueType Peek() {
         if (iter == end) { return 0; }
         return *iter;
     }
 
-    value_type consume() {
+    ValueType Consume() {
         return *(iter++);
     }
 
-    void consume(size_t n) {
+    void Consume(size_t n) {
         std::advance(iter, n);
     }
 };

@@ -3,23 +3,23 @@
 #include <optional>
 #include <functional>
 
-namespace parsefw::util {
+namespace pfw::util {
 
 // or_else for std::optional
 
 //      <|> from Alternative, but the second argument is wrapped in lambda for laziness
-//      (|) :: Maybe a -> (void -> Maybe a) -> Maybe a
-//		(Just x) | func = Just x
-//		Nothing | func = func()
+//      (>) :: Maybe a -> (void -> Maybe a) -> Maybe a
+//		(Just x) > func = Just x
+//		Nothing > func = func()
 template<typename T, typename F>
 std::optional<T> operator>(std::optional<T> opt, F&& func) {
     return opt ? opt : std::invoke(std::forward<F>(func));
 }
 
 //      fromMaybe, but the second argument is wrapped in lambda for laziness
-//      (&) :: Maybe a -> (void -> a) -> a
-//      (Just x) & func = x
-//      Nothing & func = func()
+//      (>=) :: Maybe a -> (void -> a) -> a
+//      (Just x) >= func = x
+//      Nothing >= func = func()
 template<typename T, typename F>
 T operator>=(std::optional<T> opt, F&& func) {
     return opt ? *opt : std::invoke(std::forward<F>(func));
@@ -30,7 +30,7 @@ T operator>=(std::optional<T> opt, F&& func) {
 // helper for visiting
 
 template<typename... Ts>
-struct overloaded : Ts ... {
+struct overloaded : Ts ... { //NOLINT
     using Ts::operator()...;
 };
 template<class... Ts>
