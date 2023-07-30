@@ -10,7 +10,7 @@ int main() {
     using namespace language::kotlin_func;
     using namespace parsefw;
 
-    std::string test = "fun f(a: Array<List<Int>>, b: Double)  : Set<Map<K>>"; // funCtion
+    std::string test = "fun funCtion(a: Array<List<Int>>, b: Double)  : Set<Map<K>>";
     std::cout << test << "\n";
 
     lexer lex(test.begin(), test.end());
