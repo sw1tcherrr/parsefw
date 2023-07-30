@@ -1,13 +1,15 @@
 #pragma once
 
 #include <variant>
+
 #include "lexer_base.hpp"
 
 namespace pfw {
 
-template<std::bidirectional_iterator I, typename Lexer, typename Token>
+template <std::bidirectional_iterator I, typename Lexer, typename Token>
 struct ParserBase {
-    ParserBase(I begin, I end) : lex(std::move(begin), std::move(end)) {}
+    ParserBase(I begin, I end) : lex(std::move(begin), std::move(end)) {
+    }
 
     ParserBase(ParserBase const&) = delete;
     ParserBase& operator=(ParserBase const&) = delete;
@@ -32,4 +34,4 @@ protected:
     }
 };
 
-} // namespace parsefw
+}  // namespace pfw

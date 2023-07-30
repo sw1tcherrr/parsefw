@@ -9,11 +9,12 @@
 
 namespace pfw {
 
-template<std::bidirectional_iterator I>
+template <std::bidirectional_iterator I>
 struct LexerBase {
     using ValueType = typename std::iterator_traits<I>::value_type;
 
-    LexerBase(I begin, I end) : iter(std::move(begin)), end(std::move(end)) {}
+    LexerBase(I begin, I end) : iter(std::move(begin)), end(std::move(end)) {
+    }
 
     LexerBase(LexerBase const&) = delete;
     LexerBase& operator=(LexerBase const&) = delete;
@@ -33,13 +34,15 @@ protected:
         return c == Peek();
     }
 
-    template<std::predicate<std::_Bit_const_iterator::value_type> P>
+    template <std::predicate<std::_Bit_const_iterator::value_type> P>
     bool Expect(P&& p) {
         return std::invoke(std::forward<P>(p), Peek());
     }
 
     ValueType Peek() {
-        if (iter == end) { return 0; }
+        if (iter == end) {
+            return 0;
+        }
         return *iter;
     }
 
@@ -52,4 +55,4 @@ protected:
     }
 };
 
-} // namespace parsefw
+}  // namespace pfw

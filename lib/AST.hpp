@@ -1,14 +1,16 @@
 #pragma once
 
-#include <vector>
 #include <ostream>
+#include <vector>
+
 #include "token_base.hpp"
 
 namespace pfw::ast {
 
 template <typename Token>
 struct TokenNode {
-    explicit TokenNode(Token tok) : m_tok(std::move(tok)) {}
+    explicit TokenNode(Token tok) : m_tok(std::move(tok)) {
+    }
 
     [[nodiscard]]
     bool IsTerminal() const {
@@ -23,10 +25,10 @@ struct TokenNode {
                 [](keyword const& k) { return "keyword\\n" + k.name; },
                 [](id const& i) { return "identifier\\n" + i.name; }
             }, tok);*/
-        "aboba";
+            "aboba";
     }
 
-    template<class T>
+    template <typename T>
     std::vector<T> const& Children() const {
         return {};
     }
@@ -38,7 +40,8 @@ private:
 template <typename LangNode>
 struct NonterminalNode {
     NonterminalNode() = delete;
-    explicit NonterminalNode(std::string name) : m_name(std::move(name)) {}
+    explicit NonterminalNode(std::string name) : m_name(std::move(name)) {
+    }
 
     [[nodiscard]]
     bool IsTerminal() const {
@@ -51,7 +54,9 @@ struct NonterminalNode {
     }
 
     bool AddChild(std::optional<LangNode>&& maybe_child) {
-        if (!maybe_child) { return false; }
+        if (!maybe_child) {
+            return false;
+        }
         m_children.push_back(std::move(*maybe_child));
         return true;
     }
@@ -72,18 +77,17 @@ private:
 template <typename LangNode, typename... Nodes>
 struct LangNodeBase {
     template <typename Node>
-    explicit LangNodeBase(Node n) : value(std::move(n)) {}
+    explicit LangNodeBase(Node n) : value(std::move(n)) {
+    }
 
     [[nodiscard]]
     bool IsTerminal() const {
-        return std::visit([](auto&& v) {return v.IsTerminal(); }, value);
+        return std::visit([](auto&& v) { return v.IsTerminal(); }, value);
     }
 
     [[nodiscard]]
     std::string Label() const {
-        return std::visit([](auto &&v) {
-            return v.Label();
-        }, value);
+        return std::visit([](auto&& v) { return v.Label(); }, value);
     }
 
     // Pre: this LangNode is non-terminal node
@@ -96,6 +100,7 @@ struct LangNodeBase {
 
 protected:
     using NtNode = NonterminalNode<LangNode>;
+
     [[nodiscard]]
     NtNode const* AsNtNode() const {
         return std::visit([]<typename T>(T const& v) -> NtNode const*{
@@ -110,4 +115,4 @@ protected:
     std::variant<Nodes...> value;
 };
 
-}
+}  // namespace pfw::ast

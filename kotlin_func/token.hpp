@@ -1,16 +1,16 @@
 #pragma once
 
-#include <variant>
 #include <array>
-#include <unordered_set>
 #include <string>
-#include "../lib/util.hpp"
-#include "../lib/token_base.hpp"
+#include <unordered_set>
+#include <variant>
 
+#include "../lib/token_base.hpp"
+#include "../lib/util.hpp"
 
 namespace language::kotlin_func {
 
-namespace x = pfw::token; // todo rename
+namespace x = pfw::token;  // todo rename
 
 struct ID : x::Variable  { static constexpr std::string_view kPattern = R"([a-zA-Z_][\w-]*)"; }; // needs concrete string value
 struct FUN : x::Exact    { static constexpr std::string_view kPattern = R"(fun)"; }; // todo dont store string_value if it is equal to pattern
@@ -31,4 +31,4 @@ std::ostream& operator<<(std::ostream& os, Token const& t) {
     return os;
 }
 
-} // namespace language::kotlin_func
+}  // namespace language::kotlin_func

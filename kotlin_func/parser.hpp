@@ -2,14 +2,15 @@
 
 #include "../lib/parser_base.hpp"
 #include "AST.hpp"
-#include "token.hpp"
 #include "lexer.hpp"
+#include "token.hpp"
 
 namespace language::kotlin_func {
 
 template <std::bidirectional_iterator I>
 struct Parser : pfw::ParserBase<I, Lexer<I>, Token> {
-    Parser(I begin, I end) : Base(std::move(begin), std::move(end)) {}
+    Parser(I begin, I end) : Base(std::move(begin), std::move(end)) {
+    }
 
     using Node = ast::Node;
     std::optional<Node> Parse() {
@@ -94,7 +95,9 @@ private:
             NextToken();
             return {Node(std::move(res))};
         }
-        if (this->template Expect<pfw::Eof>() || this->template Expect<RANGLE>() || this->template Expect<COMMA>() || this->template Expect<RPAREN>()) {
+        if (this->template Expect<pfw::Eof>() || this->template Expect<RANGLE>()
+            || this->template Expect<COMMA>() || this->template Expect<RPAREN>())
+        {
             std::cout << "MaybeGeneric -> eps\n";
             return {Node(NtNode{"MaybeGeneric"})};
         }
@@ -133,4 +136,4 @@ private:
         return std::nullopt;
     }
 };
-} // namespace language::kotlin_func
+}  // namespace language::kotlin_func

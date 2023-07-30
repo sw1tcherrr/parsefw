@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ostream>
 #include <fstream>
+#include <ostream>
 
 namespace pfw::graphviz {
 
@@ -21,8 +21,9 @@ struct GraphvizNode {
     }
 
     void PrintChildren(std::ostream& os) const {
-        if (Self().IsTerminal()) { return;
-}
+        if (Self().IsTerminal()) {
+            return;
+        }
 
         os << m_id << " -> {";
         for (auto const& c : Self().Children()) {
@@ -44,20 +45,20 @@ private:
 };
 
 namespace {
-template<typename LangNode>
-int AstToDotVisit(std::ostream &os, LangNode const &node, int cnt = 0) {
-    auto const &gf_root = GraphvizNode<LangNode>::AsGfNode(node);
+template <typename LangNode>
+int AstToDotVisit(std::ostream& os, LangNode const& node, int cnt = 0) {
+    auto const& gf_root = GraphvizNode<LangNode>::AsGfNode(node);
     gf_root.SetId(cnt);
     gf_root.PrintAttributes(os);
     if (!node.IsTerminal()) {
-        for (auto const &c: node.Children()) {
+        for (auto const& c : node.Children()) {
             cnt = AstToDotVisit(os, c, ++cnt);
         }
         gf_root.PrintChildren(os);
     }
     return cnt;
 }
-}
+}  // namespace
 
 template <typename LangNode>
 void AstToDot(std::ostream& os, LangNode const& root) {
@@ -66,4 +67,4 @@ void AstToDot(std::ostream& os, LangNode const& root) {
     os << "}\n";
 }
 
-}
+}  // namespace pfw::graphviz

@@ -1,15 +1,16 @@
-BasedOnStyle: Google
----
-Language: Cpp
-AllowShortFunctionsOnASingleLine: None
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLambdasOnASingleLine: Empty
-DerivePointerAlignment: false
-PointerAlignment: Left
-SortIncludes: CaseInsensitive
-PackConstructorInitializers: Never
-BreakConstructorInitializers: BeforeColon
-BreakInheritanceList: AfterComma
+#BasedOnStyle: Google
+#---
+#Language: Cpp
+#AllowShortFunctionsOnASingleLine: None
+#AllowShortIfStatementsOnASingleLine: false
+#AllowShortLambdasOnASingleLine: All
+#DerivePointerAlignment: false
+#PointerAlignment: Left
+#SortIncludes: CaseInsensitive
+#PackConstructorInitializers: CurrentLine
+#BreakConstructorInitializers: BeforeColon
+#BreakInheritanceList: AfterComma
+##BreakAfterAttributes: Always # need clang16
 
 AccessModifierOffset: -4
 IndentWidth: 4

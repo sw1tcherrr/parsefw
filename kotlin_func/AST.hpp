@@ -1,7 +1,8 @@
 #pragma once
-#include <variant>
-#include <concepts>
 #include <cassert>
+#include <concepts>
+#include <variant>
+
 #include "../lib/AST.hpp"
 #include "../lib/graphviz.hpp"
 #include "token.hpp"
@@ -16,4 +17,4 @@ struct Node : Base, pfw::graphviz::GraphvizNode<Node> {
     using Base::LangNodeBase;
 };
 
-}
+}  // namespace language::kotlin_func::ast
