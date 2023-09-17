@@ -25,7 +25,7 @@ T operator>=(std::optional<T> opt, F&& func) {
     return opt ? *opt : std::invoke(std::forward<F>(func));
 }
 
-#define PFW_LAZY(func) [&] { return func(); }
+#define PFW_LAZY(func) [this] { return func(); }
 
 // helper for visiting
 
