@@ -1,7 +1,7 @@
 #pragma once
 
 #include <concepts>
-#include <regex>
+#include <ctre.hpp>
 
 #include "../lib/lexer_base.hpp"
 #include "token.hpp"
@@ -60,27 +60,12 @@ struct Lexer : pfw::LexerBase<I> {
 private:
     using Base::iter, Base::end;
 
-    //    template <std::derived_from<parsefw::token::exact> Token>
-    //    std::optional<token> parse() {
-    //        std::regex pattern(Token::pattern.data());
-    //        std::match_results<I> m;
-    //        std::regex_search(iter, end, m, pattern, std::regex_constants::match_continuous);
-    //        if (!m.empty()) {
-    //            base::consume(m[0].second - m[0].first); // problem if exact pattern contains regex escapes which make string_value longer
-    //            // todo: make this not real consume, remember start position
-    //            return {token{Token{}}}; // todo string_value not initialized
-    //        }
-    //        return {};
-    //    }
-
-    template <std::derived_from<pfw::token::String> T>
+    template <std::derived_from<pfw::token::String> TokenType>
     std::optional<Token> Parse() {
-        std::regex pattern(T::kPattern.data());
-        std::match_results<I> m;
-        std::regex_search(iter, end, m, pattern, std::regex_constants::match_continuous);
-        if (!m.empty()) {
-            T res{std::string(m[0].first, m[0].second)};  // todo понятнее
-            Base::Consume(m[0].second - m[0].first);
+        auto match = ctre::starts_with<TokenType::kPattern>(iter, end);
+        if (match) {
+            TokenType res{pfw::token::String{.string_value = std::string_view(iter, iter + match.size())}};
+            Base::Consume(match.size());
             return {Token{std::move(res)}};
         }
         return {};

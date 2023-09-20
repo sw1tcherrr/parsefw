@@ -21,7 +21,7 @@ T GetNumericValue(Token const& t) {
 }
 
 struct String {
-    std::string string_value;
+    std::string_view string_value;
 };
 
 template <std::derived_from<String> Token>
