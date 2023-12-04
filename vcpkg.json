@@ -1,6 +1,7 @@
 {
   "name": "parsefw",
   "dependencies": [
-    "ctre"
+    "ctre",
+    "tl-expected"
   ]
 }
