@@ -4,6 +4,7 @@
 #include "AST.hpp"
 #include "lexer.hpp"
 #include "token.hpp"
+#include "../lib/util.hpp"
 
 namespace language::kotlin_func {
 

@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <optional>
+#include <iostream>
 
 namespace pfw::util {
 
@@ -25,7 +26,7 @@ T operator>=(std::optional<T> opt, F&& func) {
     return opt ? *opt : std::invoke(std::forward<F>(func));
 }
 
-#define PFW_LAZY(func) [this] { return func(); }
+#define PFW_LAZY(func) [&] { return func(); }
 
 // helper for visiting
 
@@ -40,7 +41,7 @@ overloaded(Ts...) -> overloaded<Ts...>;
 
 #define PFW_TRY(x)                                        \
     if (!(x)) [[unlikely]] {                              \
-        std::cout << __FILE__ << ":" << __LINE__ << "\n"; \
+        std::cerr << __FILE__ << ":" << __LINE__ << "\n"; \
         return std::nullopt;                              \
     }
 

@@ -1,18 +1,14 @@
 #pragma once
 
 #include <concepts>
+#include <functional>
 #include <iterator>
 #include <optional>
-
-#include "token_base.hpp"
-#include "util.hpp"
 
 namespace pfw {
 
 template <std::bidirectional_iterator I>
 struct LexerBase {
-    using ValueType = typename std::iterator_traits<I>::value_type;
-
     LexerBase(I begin, I end) : iter(std::move(begin)), end(std::move(end)) {
     }
 
@@ -23,7 +19,9 @@ protected:
     I iter;
     I end;
 
-    template <std::predicate<std::_Bit_const_iterator::value_type> P>
+    using ValueType = typename std::iterator_traits<I>::value_type;
+
+    template <std::predicate<ValueType> P>
     void Skip(P&& p) {
         while (Expect(std::forward<P>(p))) {
             Consume();
@@ -34,7 +32,7 @@ protected:
         return c == Peek();
     }
 
-    template <std::predicate<std::_Bit_const_iterator::value_type> P>
+    template <std::predicate<ValueType> P>
     bool Expect(P&& p) {
         return std::invoke(std::forward<P>(p), Peek());
     }

@@ -2,6 +2,8 @@
 
 #include <ostream>
 #include <vector>
+#include <variant>
+#include <optional>
 
 #include "token_base.hpp"
 

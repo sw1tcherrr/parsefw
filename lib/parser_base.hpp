@@ -1,8 +1,7 @@
 #pragma once
 
+#include <functional>
 #include <variant>
-
-#include "lexer_base.hpp"
 
 namespace pfw {
 

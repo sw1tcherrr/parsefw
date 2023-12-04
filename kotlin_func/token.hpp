@@ -1,9 +1,11 @@
 #pragma once
 
 #include <array>
+#include <ctll/fixed_string.hpp>
 #include <string>
 #include <unordered_set>
 #include <variant>
+#include <ostream>
 
 #include "../lib/token_base.hpp"
 #include "../lib/util.hpp"
