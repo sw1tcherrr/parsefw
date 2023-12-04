@@ -5,7 +5,7 @@
 -[ ] добавить в грамматику kotlin_func дефолтное значение параметра (инт) `f(a: T = 5)`
 
 Core:
--[ ] аналог LLVM MemoryBuffer - обертка над готовым буфером (строкой), или memory mapped файлом => дает bidirectional итераторы
+-[x] аналог LLVM MemoryBuffer - обертка над готовым буфером (строкой), или memory mapped файлом => дает bidirectional итераторы
   - stdin не поддерживаем
   - `llvm::MemoryBuffer`
   - `boost::iostreams::mapped_file`
