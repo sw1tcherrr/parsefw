@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../lib/parser_base.hpp"
+#include "../lib/util.hpp"
 #include "AST.hpp"
 #include "lexer.hpp"
 #include "token.hpp"
-#include "../lib/util.hpp"
 
 namespace language::kotlin_func {
 
@@ -97,8 +97,7 @@ private:
             return {Node(std::move(res))};
         }
         if (this->template Expect<pfw::Eof>() || this->template Expect<RANGLE>()
-            || this->template Expect<COMMA>() || this->template Expect<RPAREN>())
-        {
+            || this->template Expect<COMMA>() || this->template Expect<RPAREN>()) {
             std::cout << "MaybeGeneric -> eps\n";
             return {Node(NtNode{"MaybeGeneric"})};
         }

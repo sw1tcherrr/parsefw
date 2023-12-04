@@ -13,7 +13,8 @@ using namespace pfw::ast;
 struct Node;
 using Base = LangNodeBase<Node, TokenNode<Token>, NonterminalNode<Node>>;
 
-struct Node : Base, pfw::graphviz::GraphvizNode<Node> {
+struct Node : Base,
+              pfw::graphviz::GraphvizNode<Node> {
     using Base::LangNodeBase;
 };
 

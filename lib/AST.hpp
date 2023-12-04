@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ostream>
-#include <vector>
-#include <variant>
 #include <optional>
+#include <ostream>
+#include <variant>
+#include <vector>
 
 #include "token_base.hpp"
 
@@ -101,13 +101,15 @@ protected:
 
     [[nodiscard]]
     NtNode const* AsNtNode() const {
-        return std::visit([]<typename T>(T const& v) -> NtNode const*{
-            if constexpr (std::is_base_of_v<NtNode, T>) {
-                return &v;
-            } else {
-                return nullptr;
-            }
-        }, value);
+        return std::visit(
+            []<typename T>(T const& v) -> NtNode const* {
+                if constexpr (std::is_base_of_v<NtNode, T>) {
+                    return &v;
+                } else {
+                    return nullptr;
+                }
+            },
+            value);
     }
 
     std::variant<Nodes...> value;

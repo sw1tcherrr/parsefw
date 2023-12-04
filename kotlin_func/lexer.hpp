@@ -18,31 +18,32 @@ struct Lexer : pfw::LexerBase<I> {
     }
 
     Token NextToken() {
-        using util::operator>;
-        using util::operator>=;
+        using util::operator|;
+        using util::operator|=;
         Base::Skip([](unsigned char c) { return std::isspace(c); });
 
         // бывают exact и regex
         // exact между собой отсортированы по длине по убыванию
         // сначала парсятся они цепочкой из | => res_exact
         // потом парсятся regex (записанные в виде грамматики, видимо, туда же)
-        // не останавливаемся на первом сработавшем, а вызываем все, выбирамем самый длинный res_regex
-        // сравниваем длину двух res и делаем consume наибольшей
+        // не останавливаемся на первом сработавшем, а вызываем все, выбирамем самый длинный
+        // res_regex сравниваем длину двух res и делаем consume наибольшей
 
         auto start_pos = iter;
 
         auto exact_res = Parse<FUN>()
-                         > PFW_LAZY(Parse<LPAREN>)
-                         > PFW_LAZY(Parse<RPAREN>)
-                         > PFW_LAZY(Parse<LANGLE>)
-                         > PFW_LAZY(Parse<RANGLE>)
-                         > PFW_LAZY(Parse<COLON>)
-                         > PFW_LAZY(Parse<COMMA>)
-                         >= [] { return Token{Eof{}}; };
+                         | PFW_LAZY(Parse<LPAREN>)
+                         | PFW_LAZY(Parse<RPAREN>)
+                         | PFW_LAZY(Parse<LANGLE>)
+                         | PFW_LAZY(Parse<RANGLE>)
+                         | PFW_LAZY(Parse<COLON>)
+                         | PFW_LAZY(Parse<COMMA>)
+                         |= [] { return Token{Eof{}}; };
 
         iter = start_pos;
 
-        auto variable_res = Parse<ID>() >= [] { return Token{Eof{}}; };
+        auto variable_res = Parse<ID>() 
+                            |= [] { return Token{Eof{}}; };
 
         iter = start_pos;
 
