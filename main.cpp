@@ -24,6 +24,6 @@ int main() {
 
     Parser p(test.begin(), test.end());
     auto ast = p.Parse().value();
-    auto out = std::ofstream("../ast.dot");
+    auto out = std::ofstream("ast.dot");
     pfw::graphviz::AstToDot(out, ast);
 }
