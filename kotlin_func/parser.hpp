@@ -23,7 +23,7 @@ private:
     using Base = pfw::ParserBase<I, Lexer<I>, Token>;
     using Base::NextToken, Base::Expect;
     using NtNode = pfw::ast::NonterminalNode<Node>;
-    using TNode = pfw::ast::TokenNode<Token>;
+    using TNode = pfw::ast::TokenNode<Token, Node>;
 
     void AddTokenChild(NtNode& n) {
         n.AddChild(Node{TNode{this->cur_token}});

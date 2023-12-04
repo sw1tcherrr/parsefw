@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <ostream>
+#include <span>
 #include <variant>
 #include <vector>
 
@@ -9,7 +10,7 @@
 
 namespace pfw::ast {
 
-template <typename Token>
+template <typename Token, typename LangNode>
 struct TokenNode {
     explicit TokenNode(Token tok) : m_tok(std::move(tok)) {
     }
@@ -24,8 +25,13 @@ struct TokenNode {
         return std::string(std::visit([](auto const& t) { return pfw::token::GetStringValue(t); }, m_tok));
     }
 
-    template <typename T>
-    std::vector<T> const& Children() const {
+    [[nodiscard]]
+    std::span<const LangNode> Children() const {
+        return {};
+    }
+
+    [[nodiscard]]
+    std::span<LangNode> Children() {
         return {};
     }
 
@@ -45,8 +51,18 @@ struct NonterminalNode {
     }
 
     [[nodiscard]]
-    std::string Label() const noexcept {
+    std::string Label() const {
         return m_name;
+    }
+
+    [[nodiscard]]
+    std::span<const LangNode> Children() const& {
+        return m_children;
+    }
+
+    [[nodiscard]]
+    std::span<LangNode> Children() & {
+        return m_children;
     }
 
     bool AddChild(std::optional<LangNode>&& maybe_child) {
@@ -78,40 +94,25 @@ struct LangNodeBase {
 
     [[nodiscard]]
     bool IsTerminal() const {
-        return std::visit([](auto&& v) { return v.IsTerminal(); }, value);
+        return std::visit([](auto& v) { return v.IsTerminal(); }, value);
     }
 
     [[nodiscard]]
     std::string Label() const {
-        return std::visit([](auto&& v) { return v.Label(); }, value);
+        return std::visit([](auto& v) { return v.Label(); }, value);
     }
 
-    // Pre: this LangNode is non-terminal node
     [[nodiscard]]
-    // todo: span instead of vector?
-    // todo: make Children() function both in TokenNode and NonterminalNode?
-    std::vector<LangNode> const& Children() const {
-        auto* nt = AsNtNode();
-        assert(nt);
-        return nt->m_children;
+    std::span<const LangNode> Children() const& {
+        return std::visit([](auto& v) { return v.Children(); }, value);
+    }
+
+    [[nodiscard]]
+    std::span<LangNode> Children() & {
+        return std::visit([](auto& v) { return v.Children(); }, value);
     }
 
 protected:
-    using NtNode = NonterminalNode<LangNode>;
-
-    [[nodiscard]]
-    NtNode const* AsNtNode() const {
-        return std::visit(
-            []<typename T>(T const& v) -> NtNode const* {
-                if constexpr (std::is_base_of_v<NtNode, T>) {
-                    return &v;
-                } else {
-                    return nullptr;
-                }
-            },
-            value);
-    }
-
     std::variant<Nodes...> value;
 };
 
