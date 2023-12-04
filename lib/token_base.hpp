@@ -37,6 +37,12 @@ std::string_view GetStringValue(Eof const& t) {
     return "";
 }
 
+#define PFW_TOKEN(NAME, KIND, PATTERN)  \
+struct NAME : pfw::token::KIND { \
+    static constexpr ctll::fixed_string kPattern = PATTERN; \
+    static constexpr std::string_view kPatternStr = PATTERN; \
+};
+
 #define PFW_MAKE_TOKEN_TYPE(...) std::variant<pfw::Eof, __VA_ARGS__>
 
 }  // namespace pfw::token

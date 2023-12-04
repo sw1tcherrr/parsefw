@@ -12,24 +12,21 @@
 
 namespace language::kotlin_func {
 
-namespace x = pfw::token;  // todo rename
-
-// todo: wrap in macro, which would also define pattern as static constexpr string_view
-struct ID     : x::Variable { static constexpr ctll::fixed_string kPattern = R"([a-zA-Z_][\-\w]*)"; };
-struct FUN    : x::Exact { static constexpr ctll::fixed_string kPattern = R"(fun)"; };
-struct LPAREN : x::Exact { static constexpr ctll::fixed_string kPattern = R"(\()"; };
-struct RPAREN : x::Exact { static constexpr ctll::fixed_string kPattern = R"(\))"; };
-struct LANGLE : x::Exact { static constexpr ctll::fixed_string kPattern = R"(<)"; };
-struct RANGLE : x::Exact { static constexpr ctll::fixed_string kPattern = R"(>)"; };
-struct COLON  : x::Exact { static constexpr ctll::fixed_string kPattern = R"(:)"; };
-struct COMMA  : x::Exact { static constexpr ctll::fixed_string kPattern = R"(,)"; };
+PFW_TOKEN(ID,     Variable, R"([a-zA-Z_][\-\w]*)")
+PFW_TOKEN(FUN,    Exact, R"(fun)")
+PFW_TOKEN(LPAREN, Exact, R"(\()")
+PFW_TOKEN(RPAREN, Exact, R"(\))")
+PFW_TOKEN(LANGLE, Exact, R"(<)")
+PFW_TOKEN(RANGLE, Exact, R"(>)")
+PFW_TOKEN(COLON,  Exact, R"(:)")
+PFW_TOKEN(COMMA,  Exact, R"(,)")
 
 using Token = PFW_MAKE_TOKEN_TYPE(ID, FUN, LPAREN, RPAREN, LANGLE, RANGLE, COLON, COMMA);
 
 std::ostream& operator<<(std::ostream& os, Token const& t) {
     std::visit(pfw::util::overloaded{
                    [&](pfw::Eof) { os << "EOF\n"; },
-                   [&](const auto& x) { os << x::GetStringValue(x) << "\n"; },
+                   [&](const auto& x) { os << pfw::token::GetStringValue(x) << "\n"; },
                },
                t);
     return os;
