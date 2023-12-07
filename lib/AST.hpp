@@ -3,6 +3,7 @@
 #include <optional>
 #include <ostream>
 #include <span>
+#include <tl/expected.hpp>
 #include <variant>
 #include <vector>
 
@@ -65,17 +66,16 @@ struct NonterminalNode {
         return m_children;
     }
 
-    bool AddChild(std::optional<LangNode>&& maybe_child) {
+    tl::expected<std::monostate, std::string> AddChild(tl::expected<LangNode, std::string>&& maybe_child) {
         if (!maybe_child) {
-            return false;
+            return tl::unexpected(maybe_child.error());
         }
         m_children.push_back(std::move(*maybe_child));
-        return true;
+        return {};
     }
 
-    bool AddChild(LangNode&& child) {
+    void AddChild(LangNode&& child) {
         m_children.push_back(std::move(child));
-        return true;
     }
 
 private:
@@ -104,7 +104,7 @@ struct LangNodeBase {
 
     [[nodiscard]]
     std::span<const LangNode> Children() const& {
-        return std::visit([](auto& v) { return v.Children(); }, value);
+        return std::visit([](auto const& v) { return v.Children(); }, value);
     }
 
     [[nodiscard]]

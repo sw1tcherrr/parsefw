@@ -8,7 +8,6 @@
 #include <variant>
 
 #include "../lib/token_base.hpp"
-#include "../lib/util.hpp"
 
 namespace language::kotlin_func {
 
@@ -21,15 +20,6 @@ PFW_TOKEN(RANGLE, Exact, R"(>)")
 PFW_TOKEN(COLON,  Exact, R"(:)")
 PFW_TOKEN(COMMA,  Exact, R"(,)")
 
-using Token = PFW_MAKE_TOKEN_TYPE(ID, FUN, LPAREN, RPAREN, LANGLE, RANGLE, COLON, COMMA);
-
-std::ostream& operator<<(std::ostream& os, Token const& t) {
-    std::visit(pfw::util::overloaded{
-                   [&](pfw::Eof) { os << "EOF\n"; },
-                   [&](const auto& x) { os << pfw::token::GetStringValue(x) << "\n"; },
-               },
-               t);
-    return os;
-}
+using Token = pfw::token::TokenType<ID, FUN, LPAREN, RPAREN, LANGLE, RANGLE, COLON, COMMA>;
 
 }  // namespace language::kotlin_func

@@ -1,6 +1,9 @@
 #pragma once
 
+#include <format>
 #include <functional>
+#include <string>
+#include <tl/expected.hpp>
 #include <variant>
 
 namespace pfw {
@@ -22,15 +25,18 @@ protected:
     }
 
     template <typename T>
-    bool Expect() {
-        return std::holds_alternative<T>(cur_token);
+    tl::expected<std::monostate, std::string> Expect() {
+        if (std::holds_alternative<T>(cur_token)) {
+            return {};
+        }
+        return tl::unexpected(std::format("Expected {}, got {}", T::kName, cur_token));
     }
 
-    template <typename T, std::predicate<T> P>
-    bool Expect(P&& p) {
-        auto t = std::get_if<T>(&cur_token);
-        return t && std::invoke(std::forward<P>(p), *t);
-    }
+    // template <typename T, std::predicate<T> P>
+    // bool Expect(P&& p) {
+    //     auto t = std::get_if<T>(&cur_token);
+    //     return t && std::invoke(std::forward<P>(p), *t);
+    // }
 };
 
 }  // namespace pfw

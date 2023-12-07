@@ -39,10 +39,13 @@ overloaded(Ts...) -> overloaded<Ts...>;
 
 // instead of exceptions
 
-#define PFW_TRY(x)                                        \
-    if (!(x)) [[unlikely]] {                              \
-        std::cerr << __FILE__ << ":" << __LINE__ << "\n"; \
-        return std::nullopt;                              \
-    }
+#define PFW_TRY(x)                                            \
+    do {                                                      \
+        auto tmp = (x);                                       \
+        if (!tmp) [[unlikely]] {                              \
+            std::cerr << __FILE__ << ":" << __LINE__ << "\n"; \
+            return tl::unexpected(std::move(tmp).error());    \
+        }                                                     \
+    } while (0);
 
 }  // namespace pfw::util

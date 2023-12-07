@@ -5,6 +5,8 @@
 #include "AST.hpp"
 #include "lexer.hpp"
 #include "token.hpp"
+#include <format>
+#include <tl/expected.hpp>
 
 namespace language::kotlin_func {
 
@@ -14,14 +16,16 @@ struct Parser : pfw::ParserBase<I, Lexer<I>, Token> {
     }
 
     using Node = ast::Node;
-    std::optional<Node> Parse() {
+    using Result = tl::expected<Node, std::string>;
+    
+    Result Parse() {
         NextToken();
         return Declaration();
     }
 
 private:
     using Base = pfw::ParserBase<I, Lexer<I>, Token>;
-    using Base::NextToken, Base::Expect;
+    using Base::NextToken;
     using NtNode = pfw::ast::NonterminalNode<Node>;
     using TNode = pfw::ast::TokenNode<Token, Node>;
 
@@ -29,7 +33,7 @@ private:
         n.AddChild(Node{TNode{this->cur_token}});
     }
 
-    std::optional<Node> Declaration() {
+    Result Declaration() {
         NtNode res{"Declaration"};
         PFW_TRY(this->template Expect<FUN>())
         AddTokenChild(res);
@@ -48,7 +52,7 @@ private:
         return {Node(std::move(res))};
     }
 
-    std::optional<Node> Args() {
+    Result Args() {
         if (this->template Expect<ID>()) {
             NtNode res{"Args"};
             std::cout << "Args -> Arg MaybeArgs\n";
@@ -60,10 +64,11 @@ private:
             std::cout << "Args -> eps\n";
             return {Node(NtNode{"Args"})};
         }
-        return std::nullopt;
+
+        return tl::unexpected(std::format("Expected ID or RPAREN, got {}\n", this->cur_token));
     }
 
-    std::optional<Node> Arg() {
+    Result Arg() {
         NtNode res{"Arg"};
         PFW_TRY(this->template Expect<ID>())
         AddTokenChild(res);
@@ -75,7 +80,7 @@ private:
         return {Node(std::move(res))};
     }
 
-    std::optional<Node> Type() {
+    Result Type() {
         NtNode res{"Type"};
         PFW_TRY(this->template Expect<ID>())
         AddTokenChild(res);
@@ -84,7 +89,7 @@ private:
         return {Node(std::move(res))};
     }
 
-    std::optional<Node> MaybeGeneric() {
+    Result MaybeGeneric() {
         if (this->template Expect<LANGLE>()) {
             NtNode res{"MaybeGeneric"};
             std::cout << "MaybeGeneric -> < Type >\n";
@@ -96,15 +101,15 @@ private:
             NextToken();
             return {Node(std::move(res))};
         }
-        if (this->template Expect<pfw::Eof>() || this->template Expect<RANGLE>()
+        if (this->template Expect<pfw::token::END>() || this->template Expect<RANGLE>()
             || this->template Expect<COMMA>() || this->template Expect<RPAREN>()) {
             std::cout << "MaybeGeneric -> eps\n";
             return {Node(NtNode{"MaybeGeneric"})};
         }
-        return std::nullopt;
+        return tl::unexpected(std::format("Expected LANGLE or RANGLE or COMMA or RPAREN or END, got {}\n", this->cur_token));
     }
 
-    std::optional<Node> MaybeArgs() {
+    Result MaybeArgs() {
         if (this->template Expect<COMMA>()) {
             NtNode res{"MaybeArgs"};
             std::cout << "MaybeArgs -> , Args\n";
@@ -117,10 +122,10 @@ private:
             std::cout << "MaybeArgs -> eps\n";
             return {Node(NtNode{"MaybeArgs"})};
         }
-        return std::nullopt;
+        return tl::unexpected(std::format("Expected COMMA or RPAREN, got {}\n", this->cur_token));
     }
 
-    std::optional<Node> MaybeReturnType() {
+    Result MaybeReturnType() {
         if (this->template Expect<COLON>()) {
             NtNode res{"MaybeReturnType"};
             std::cout << "MaybeReturnType -> : Type\n";
@@ -129,11 +134,11 @@ private:
             PFW_TRY(res.AddChild(Type()))
             return {Node(std::move(res))};
         }
-        if (this->template Expect<pfw::Eof>()) {
+        if (this->template Expect<pfw::token::END>()) {
             std::cout << "MaybeReturnType -> eps\n";
             return {Node(NtNode{"MaybeReturnType"})};
         }
-        return std::nullopt;
+        return tl::unexpected(std::format("Expected COLON or END, got {}\n", this->cur_token));
     }
 };
 }  // namespace language::kotlin_func

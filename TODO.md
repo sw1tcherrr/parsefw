@@ -14,7 +14,7 @@ Core:
   -  решает `todo dont store string_value if it is equal to pattern`
 -[x] токен знает, с какого байта начинается => хранить доп инфу про \n => уметь мапить токены в source location
 -[x] рефакторить Children в AST
--[ ] замена `optional` на `expected`
+-[x] замена `optional` на `expected`
 -[x] замена `std::regex` на `ctre` => токены имеют `static constexpr` не паттерн, а скомпилированный регекс 
 
 Тесты:
