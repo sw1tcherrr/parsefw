@@ -39,4 +39,26 @@ int main() {
 
     ToString(std::cout, root);
     std::cout << "\n";
+
+    Node root2 =
+    NtNode("Declaration", {
+        TNode(FUN("fun")),
+        TNode(ID("F")),
+        TNode(LPAREN("(")),
+        NtNode("Args", {
+            NtNode("Arg", {
+                TNode(ID("a")),
+                TNode(COLON(":")),
+                NtNode("Type", {
+                    TNode(ID("Int"))
+                })
+            })
+        }),
+        TNode(RPAREN(")"))
+    });
+
+    ToString(std::cout, root2);
+    std::cout << "\n";
+
+    std::cout << (root == root) << " " << (root == root2);
 }

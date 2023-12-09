@@ -37,6 +37,10 @@ struct TokenNode {
         return {};
     }
 
+    bool operator==(TokenNode const& other) const {
+        return m_tok == other.m_tok;
+    }
+
 private:
     Token m_tok;
 };
@@ -84,6 +88,10 @@ struct NonterminalNode {
         return *this;
     }
 
+    bool operator==(NonterminalNode const& other) const {
+        return m_children == other.m_children;
+    }
+
 private:
     template <typename LNode, typename... Nodes>
     friend struct LangNodeBase;
@@ -126,6 +134,10 @@ struct LangNodeBase {
     [[nodiscard]]
     std::span<LangNode> Children() & {
         return Visit([](auto& v) { return v.Children(); });
+    }
+
+    bool operator==(LangNodeBase const& other) const {
+        return value == other.value;
     }
 
 protected:

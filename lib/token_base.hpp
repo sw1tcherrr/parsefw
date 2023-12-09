@@ -16,6 +16,10 @@ struct TokenBase {
     explicit TokenBase(std::string_view string_value = "", size_t line = 0, size_t position = 0) 
     : string_value(string_value), line(line), position(position) {
     }
+
+    bool operator==(TokenBase const& other) const {
+        return string_value == other.string_value;
+    }
 };
 
 std::string_view GetStringValue(TokenBase const& t) {

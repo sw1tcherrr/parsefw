@@ -22,11 +22,12 @@ Core:
 - [x] добавить Visit в LangNodeBase
 - [x] конструкторы для токенов от string_value и тп
 - [ ] не бросать в NextToken
+- [ ] ? шаблон вместо макроса PFW_TOKEN
 - [ ] cmake и структура папок (target_include_directories)
 - [ ] camelCase для функций в clang tidy
 
 Тесты:
 
 - [x] декларативное построение AST
-- [ ] сравнение AST
+- [x] сравнение AST
 - [ ] google test
