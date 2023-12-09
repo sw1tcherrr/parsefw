@@ -57,6 +57,14 @@ protected:
     void Consume(size_t n) {
         std::advance(iter, n);
     }
+
+    size_t Line() {
+        return lines.size() - 1;
+    }
+
+    size_t Position() {
+        return iter - lines.back();
+    }
 };
 
 }  // namespace pfw
