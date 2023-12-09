@@ -9,9 +9,13 @@
 namespace pfw::token {
 
 struct TokenBase {
+    std::string_view string_value;
     size_t line;
     size_t position;
-    std::string_view string_value;
+
+    explicit TokenBase(std::string_view string_value = "", size_t line = 0, size_t position = 0) 
+    : string_value(string_value), line(line), position(position) {
+    }
 };
 
 std::string_view GetStringValue(TokenBase const& t) {
@@ -29,17 +33,16 @@ T GetNumericValue(Token const& t) {
     return t.numeric_value;
 }
 
-struct Exact : TokenBase {};
-struct Variable : TokenBase {};
-
-#define PFW_TOKEN(NAME, KIND, PATTERN)  \
-struct NAME : pfw::token::KIND { \
+#define PFW_TOKEN(NAME, PATTERN, ...)  \
+struct NAME : ::pfw::token::TokenBase, ##__VA_ARGS__ { \
     static constexpr ctll::fixed_string kPattern = PATTERN; \
     static constexpr std::string_view kPatternStr = PATTERN; \
     static constexpr std::string_view kName = #NAME;\
+    using Base = ::pfw::token::TokenBase; \
+    using Base::TokenBase; \
 };
 
-PFW_TOKEN(END, TokenBase, "")
+PFW_TOKEN(END, "")
 
 template <typename... Tokens>
 using TokenType = std::variant<END, Tokens...>;

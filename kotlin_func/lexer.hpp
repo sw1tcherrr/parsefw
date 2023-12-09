@@ -11,8 +11,6 @@
 
 namespace language::kotlin_func {
 
-using namespace pfw;
-
 template <std::bidirectional_iterator I>
 struct Lexer : pfw::LexerBase<I> {
     using Base = pfw::LexerBase<I>;
@@ -21,16 +19,9 @@ struct Lexer : pfw::LexerBase<I> {
     }
 
     Token NextToken() {
-        using util::operator|;
-        using util::operator|=;
+        using pfw::util::operator|;
+        using pfw::util::operator|=;
         Base::Skip([](unsigned char c) { return std::isspace(c); });
-
-        // бывают exact и regex
-        // exact между собой отсортированы по длине по убыванию
-        // сначала парсятся они цепочкой из | => res_exact
-        // потом парсятся regex (записанные в виде грамматики, видимо, туда же)
-        // не останавливаемся на первом сработавшем, а вызываем все, выбирамем самый длинный
-        // res_regex сравниваем длину двух res и делаем consume наибольшей
 
         auto start_pos = iter;
 
@@ -47,12 +38,13 @@ struct Lexer : pfw::LexerBase<I> {
         iter = start_pos;
 
         auto variable_res = Parse<ID>()
-                                  | PFW_LAZY(Parse<pfw::token::END>);
+                            | PFW_LAZY(Parse<pfw::token::END>);
 
         iter = start_pos;
 
         if (!exact_res && !variable_res) {
-            throw std::runtime_error(std::format("Can't parse any token on line {} at position {}", this->lines.size() - 1, iter - this->lines.back())); 
+            throw std::runtime_error(std::format("Can't parse any token on line {} at position {}",
+                                        Base::Line(), Base::Position())); 
             // todo don't throw
         }
 
@@ -82,10 +74,7 @@ private:
     std::optional<Token> Parse() {
         auto match = ctre::starts_with<TokenType::kPattern>(iter, end);
         if (match) {
-            TokenType res{pfw::token::TokenBase
-                            {.line = this->lines.size() - 1,
-                            .position = size_t(iter - this->lines.back()),
-                            .string_value = std::string_view(iter, iter + match.size())}};
+            TokenType res(std::string_view(iter, iter + match.size()), Base::Line(), Base::Position());
             Base::Consume(match.size());
             return {Token{std::move(res)}};
         }
@@ -95,7 +84,7 @@ private:
     template <>
     std::optional<Token> Parse<pfw::token::END>() {
         if (iter == end) {
-            return {pfw::token::END{}};
+            return {pfw::token::END("", Base::Line(), Base::Position())};
         }
         return std::nullopt;
     }
