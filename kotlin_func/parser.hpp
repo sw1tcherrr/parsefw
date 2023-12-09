@@ -10,12 +10,13 @@
 
 namespace language::kotlin_func {
 
+using namespace ast;
+
 template <std::bidirectional_iterator I>
 struct Parser : pfw::ParserBase<I, Lexer<I>, Token> {
     Parser(I begin, I end) : Base(std::move(begin), std::move(end)) {
     }
 
-    using Node = ast::Node;
     using Result = tl::expected<Node, std::string>;
     
     Result Parse() {
@@ -26,8 +27,6 @@ struct Parser : pfw::ParserBase<I, Lexer<I>, Token> {
 private:
     using Base = pfw::ParserBase<I, Lexer<I>, Token>;
     using Base::NextToken;
-    using NtNode = pfw::ast::NonterminalNode<Node>;
-    using TNode = pfw::ast::TokenNode<Token, Node>;
 
     void AddTokenChild(NtNode& n) {
         n.AddChild(Node{TNode{this->cur_token}});
@@ -44,11 +43,11 @@ private:
         PFW_TRY(this->template Expect<LPAREN>())
         AddTokenChild(res);
         NextToken();
-        PFW_TRY(res.AddChild(Args()))
+        PFW_TRY(res.TryAddChild(Args()))
         PFW_TRY(this->template Expect<RPAREN>())
         AddTokenChild(res);
         NextToken();
-        PFW_TRY(res.AddChild(MaybeReturnType()))
+        PFW_TRY(res.TryAddChild(MaybeReturnType()))
         return {Node(std::move(res))};
     }
 
@@ -56,8 +55,8 @@ private:
         if (this->template Expect<ID>()) {
             NtNode res{"Args"};
             std::cout << "Args -> Arg MaybeArgs\n";
-            PFW_TRY(res.AddChild(Arg()))
-            PFW_TRY(res.AddChild(MaybeArgs()))
+            PFW_TRY(res.TryAddChild(Arg()))
+            PFW_TRY(res.TryAddChild(MaybeArgs()))
             return {Node(std::move(res))};
         }
         if (this->template Expect<RPAREN>()) {
@@ -76,7 +75,7 @@ private:
         PFW_TRY(this->template Expect<COLON>())
         AddTokenChild(res);
         NextToken();
-        PFW_TRY(res.AddChild(Type()))
+        PFW_TRY(res.TryAddChild(Type()))
         return {Node(std::move(res))};
     }
 
@@ -85,7 +84,7 @@ private:
         PFW_TRY(this->template Expect<ID>())
         AddTokenChild(res);
         NextToken();
-        PFW_TRY(res.AddChild(MaybeGeneric()))
+        PFW_TRY(res.TryAddChild(MaybeGeneric()))
         return {Node(std::move(res))};
     }
 
@@ -95,7 +94,7 @@ private:
             std::cout << "MaybeGeneric -> < Type >\n";
             AddTokenChild(res);
             NextToken();
-            PFW_TRY(res.AddChild(Type()))
+            PFW_TRY(res.TryAddChild(Type()))
             PFW_TRY(this->template Expect<RANGLE>())
             AddTokenChild(res);
             NextToken();
@@ -115,7 +114,7 @@ private:
             std::cout << "MaybeArgs -> , Args\n";
             AddTokenChild(res);
             NextToken();
-            PFW_TRY(res.AddChild(Args()))
+            PFW_TRY(res.TryAddChild(Args()))
             return {Node(std::move(res))};
         }
         if (this->template Expect<RPAREN>()) {
@@ -131,7 +130,7 @@ private:
             std::cout << "MaybeReturnType -> : Type\n";
             AddTokenChild(res);
             NextToken();
-            PFW_TRY(res.AddChild(Type()))
+            PFW_TRY(res.TryAddChild(Type()))
             return {Node(std::move(res))};
         }
         if (this->template Expect<pfw::token::END>()) {

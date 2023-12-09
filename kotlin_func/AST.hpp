@@ -11,7 +11,10 @@ namespace language::kotlin_func::ast {
 using namespace pfw::ast;
 
 struct Node;
-using Base = LangNodeBase<Node, TokenNode<Token, Node>, NonterminalNode<Node>>;
+using NtNode = NonterminalNode<Node>;
+using TNode = TokenNode<Token, Node>;
+
+using Base = LangNodeBase<Node, NtNode, TNode>;
 
 struct Node : Base,
               pfw::graphviz::GraphvizNode<Node> {

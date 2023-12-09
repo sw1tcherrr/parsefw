@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "token_base.hpp"
+#include "util.hpp"
 
 namespace pfw::ast {
 
@@ -23,7 +24,7 @@ struct TokenNode {
 
     [[nodiscard]]
     std::string Label() const {
-        return std::string(std::visit([](auto const& t) { return pfw::token::GetStringValue(t); }, m_tok));
+        return std::string(std::visit(pfw::token::GetStringValue, m_tok));
     }
 
     [[nodiscard]]
@@ -46,6 +47,10 @@ struct NonterminalNode {
     explicit NonterminalNode(std::string name) : m_name(std::move(name)) {
     }
 
+    NonterminalNode(std::string name, std::vector<LangNode>&& children) 
+    : m_name(std::move(name)), m_children(std::move(children)) {
+    }
+
     [[nodiscard]]
     bool IsTerminal() const {
         return false;
@@ -66,7 +71,7 @@ struct NonterminalNode {
         return m_children;
     }
 
-    tl::expected<std::monostate, std::string> AddChild(tl::expected<LangNode, std::string>&& maybe_child) {
+    tl::expected<std::monostate, std::string> TryAddChild(tl::expected<LangNode, std::string>&& maybe_child) {
         if (!maybe_child) {
             return tl::unexpected(maybe_child.error());
         }
@@ -74,8 +79,9 @@ struct NonterminalNode {
         return {};
     }
 
-    void AddChild(LangNode&& child) {
+    NonterminalNode& AddChild(LangNode&& child) {
         m_children.push_back(std::move(child));
+        return *this;
     }
 
 private:
@@ -89,27 +95,37 @@ private:
 template <typename LangNode, typename... Nodes>
 struct LangNodeBase {
     template <typename Node>
-    explicit LangNodeBase(Node n) : value(std::move(n)) {
+    LangNodeBase(Node n) : value(std::move(n)) { // NOLINT (should be implicit)
+    }
+
+    template <typename... Visitors>
+    auto Visit(Visitors&&... vs) {
+        return std::visit(util::overloaded(vs...), value);
+    }
+
+    template <typename... Visitors>
+    auto Visit(Visitors&&... vs) const {
+        return std::visit(util::overloaded(vs...), value);
     }
 
     [[nodiscard]]
     bool IsTerminal() const {
-        return std::visit([](auto& v) { return v.IsTerminal(); }, value);
+        return Visit([](auto const& v) { return v.IsTerminal(); });
     }
 
     [[nodiscard]]
     std::string Label() const {
-        return std::visit([](auto& v) { return v.Label(); }, value);
+        return Visit([](auto const& v) { return v.Label(); });
     }
 
     [[nodiscard]]
     std::span<const LangNode> Children() const& {
-        return std::visit([](auto const& v) { return v.Children(); }, value);
+        return Visit([](auto const& v) { return v.Children(); });
     }
 
     [[nodiscard]]
     std::span<LangNode> Children() & {
-        return std::visit([](auto& v) { return v.Children(); }, value);
+        return Visit([](auto& v) { return v.Children(); });
     }
 
 protected:
