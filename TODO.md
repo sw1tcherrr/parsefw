@@ -30,4 +30,4 @@ Core:
 
 - [x] декларативное построение AST
 - [x] сравнение AST
-- [ ] google test
+- [x] google test

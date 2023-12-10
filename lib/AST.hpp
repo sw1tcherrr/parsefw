@@ -24,7 +24,10 @@ struct TokenNode {
 
     [[nodiscard]]
     std::string Label() const {
-        return std::string(std::visit(pfw::token::GetStringValue, m_tok));
+        return std::visit(
+            []<typename T>(T t) {
+                return std::format("{} `{}`", T::kName, token::GetStringValue(t)); },
+            m_tok);
     }
 
     [[nodiscard]]
@@ -38,7 +41,11 @@ struct TokenNode {
     }
 
     bool operator==(TokenNode const& other) const {
-        return m_tok == other.m_tok;
+        bool res = m_tok == other.m_tok;
+        if (!res) {
+            std::cerr << "Mismatch in tokens: " << Label() << " and " << other.Label() << "\n";
+        }
+        return res;
     }
 
 private:
@@ -89,7 +96,12 @@ struct NonterminalNode {
     }
 
     bool operator==(NonterminalNode const& other) const {
-        return m_children == other.m_children;
+        bool res = m_children == other.m_children;
+        if (!res) {
+            std::cout << m_children.size() << " " << other.m_children.size();
+            std::cout << "Mismatch in children of " << Label() << " " << other.Label() << "\n";
+        }
+        return res;
     }
 
 private:
@@ -137,7 +149,11 @@ struct LangNodeBase {
     }
 
     bool operator==(LangNodeBase const& other) const {
-        return value == other.value;
+        bool res = value == other.value;
+        if (!res) {
+            std::cerr << "Mismatch in " << Label() << value.index() << " and " << other.Label() << other.value.index() << "\n";
+        }
+        return res;
     }
 
 protected:

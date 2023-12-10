@@ -2,6 +2,7 @@
 
 #include <concepts>
 #include <format>
+#include <iostream>
 #include <string>
 #include <variant>
 #include <ctll/fixed_string.hpp>
@@ -18,7 +19,11 @@ struct TokenBase {
     }
 
     bool operator==(TokenBase const& other) const {
-        return string_value == other.string_value;
+        auto res = string_value == other.string_value;
+        if (!res) {
+            std::cerr << "Mismatch in " << string_value << " " << other.string_value << "\n";
+        }
+        return res;
     }
 };
 

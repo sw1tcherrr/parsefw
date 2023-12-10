@@ -2,6 +2,7 @@
   "name": "parsefw",
   "dependencies": [
     "ctre",
-    "tl-expected"
+    "tl-expected",
+    "gtest"
   ]
 }

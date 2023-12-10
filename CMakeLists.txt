@@ -6,9 +6,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(ctre CONFIG REQUIRED)
 find_package(tl-expected CONFIG REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 
 add_executable(playground main.cpp)
-add_executable(t kotlin_func/test.cpp)
 
 target_link_libraries(playground PRIVATE ctre::ctre tl::expected)
-target_link_libraries(t PRIVATE ctre::ctre tl::expected)
+
+add_subdirectory(kotlin_func)

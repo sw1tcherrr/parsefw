@@ -1,26 +1,36 @@
 #include <iostream>
 #include <ostream>
 
-#include "AST.hpp"
-#include "../lib/util.hpp"
+#include <AST.hpp>
+#include <util.hpp>
+#include "parser.hpp"
+
+#include <gtest/gtest.h>
 
 using namespace language::kotlin_func;
 using namespace language::kotlin_func::ast;
 
-void ToString(std::ostream& os, Node const& root) {
+void ToString(std::ostream& os, Node const& root, int indent = 0) {
     root.Visit(
         [&](NtNode const& n) {
+            for (int i = 0; i < indent; ++i) {
+                os << " ";
+            }
+            os << n.Label() << "\n";
             for (auto& c : n.Children()) {
-                ToString(os, c);
+                ToString(os, c, indent + 2);
             }
         },
         [&](TNode const& n) {
-            os << n.Label() << " ";
+            for (int i = 0; i < indent; ++i) {
+                os << " ";
+            }
+            os << n.Label() << "\n";
         });
 }
 
-int main() {
-    Node root =
+TEST(Test, Test) {
+    Node expected =
     NtNode("Declaration", {
         TNode(FUN("fun")),
         TNode(ID("f")),
@@ -30,35 +40,27 @@ int main() {
                 TNode(ID("param")),
                 TNode(COLON(":")),
                 NtNode("Type", {
-                    TNode(ID("Int"))
+                    TNode(ID("Int")),
+                    NtNode("MaybeGeneric", {})
                 })
-            })
+            }),
+            NtNode("MaybeArgs", {})
         }),
-        TNode(RPAREN(")"))
+        TNode(RPAREN(")")),
+        NtNode("MaybeReturnType", {})
     });
 
-    ToString(std::cout, root);
+    std::string test = "fun f(param: Int)";
+    Parser parser(test.begin(), test.end());
+
+    auto ast = parser.Parse().value();
+
+    ToString(std::cout, ast);
+    std::cout << "\n";
+    ToString(std::cout, expected);
     std::cout << "\n";
 
-    Node root2 =
-    NtNode("Declaration", {
-        TNode(FUN("fun")),
-        TNode(ID("F")),
-        TNode(LPAREN("(")),
-        NtNode("Args", {
-            NtNode("Arg", {
-                TNode(ID("a")),
-                TNode(COLON(":")),
-                NtNode("Type", {
-                    TNode(ID("Int"))
-                })
-            })
-        }),
-        TNode(RPAREN(")"))
-    });
+    bool res = (expected == ast);
 
-    ToString(std::cout, root2);
-    std::cout << "\n";
-
-    std::cout << (root == root) << " " << (root == root2);
+    EXPECT_TRUE(res);
 }
