@@ -4,6 +4,7 @@
 #include <ctre.hpp>
 #include <stdexcept>
 #include <string_view>
+#include <tl/expected.hpp>
 
 #include "../lib/lexer_base.hpp"
 #include "../lib/util.hpp"
@@ -18,7 +19,7 @@ struct Lexer : pfw::LexerBase<I> {
     Lexer(I begin, I end) : Base(std::move(begin), std::move(end)) {
     }
 
-    Token NextToken() {
+    tl::expected<Token, std::string> NextToken() {
         using pfw::util::operator|;
         using pfw::util::operator|=;
         Base::Skip([](unsigned char c) { return std::isspace(c); });
@@ -43,7 +44,7 @@ struct Lexer : pfw::LexerBase<I> {
         iter = start_pos;
 
         if (!exact_res && !variable_res) {
-            throw std::runtime_error(std::format("Can't parse any token on line {} at position {}",
+            return tl::unexpected(std::format("Can't parse any token on line {} at position {}",
                                         Base::Line(), Base::Position())); 
             // todo don't throw
         }

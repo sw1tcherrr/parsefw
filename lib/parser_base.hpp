@@ -17,7 +17,7 @@ struct ParserBase {
     ParserBase& operator=(ParserBase const&) = delete;
 
 protected:
-    Token cur_token;
+    tl::expected<Token, std::string> cur_token;
     Lexer lex;
 
     void NextToken() {
@@ -26,10 +26,15 @@ protected:
 
     template <typename T>
     tl::expected<std::monostate, std::string> Expect() {
-        if (std::holds_alternative<T>(cur_token)) {
+        if (!cur_token.has_value()) {
+            return tl::unexpected(cur_token.error());
+        }
+
+        if (std::holds_alternative<T>(cur_token.value())) {
             return {};
         }
-        return tl::unexpected(std::format("Expected {}, got {}", T::kName, cur_token));
+        
+        return tl::unexpected(std::format("Expected {}, got {}", T::kName, cur_token.value()));
     }
 
     // template <typename T, std::predicate<T> P>
