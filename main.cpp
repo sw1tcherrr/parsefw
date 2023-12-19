@@ -1,14 +1,14 @@
 #include <fstream>
 #include <iostream>
 
-#include "kotlin_func/lexer.hpp"
-#include "kotlin_func/parser.hpp"
-#include "kotlin_func/token.hpp"
+#include "kotlin_array/lexer.hpp"
+#include "kotlin_array/parser.hpp"
+#include "kotlin_array/token.hpp"
 #include "lib/graphviz.hpp"
 #include "lib/mmap_buffer.hpp"
 
 int main() {
-    using namespace language::kotlin_func;
+    using namespace kotlin_array;
     using namespace pfw;
 
     auto buf_res = MakeMmap("test.txt");
@@ -20,7 +20,12 @@ int main() {
 
     Lexer lex(buf.begin(), buf.end());
     while (true) {
-        Token tok = lex.NextToken();
+        auto t = lex.NextToken();
+        if (!t) {
+            std::cerr << t.error();
+            break;
+        }
+        Token tok = t.value();
         std::cout << tok << "\n";
         if (tok.index() == 0) {
             break;

@@ -1,1 +1,5 @@
-fun funCtion(a: Array<List<Int>>, b: Double)  : Set<Map<K>>
+var 
+   x : 
+    Array 
+  <Int>
+                ;

@@ -13,3 +13,4 @@ add_executable(playground main.cpp)
 target_link_libraries(playground PRIVATE ctre::ctre tl::expected)
 
 add_subdirectory(kotlin_func)
+add_subdirectory(kotlin_array)
