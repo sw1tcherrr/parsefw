@@ -4,12 +4,12 @@
 
 ```text
 VAR = var
-ARRAY = array
 ID = /[a-zA-Z_]\w*/
 :
 ;
 <
 >
+,
 EOF
 ```
 
@@ -18,10 +18,36 @@ EOF
 (не требует исправлений)
 
 ```text
-Program -> Declaration EOF
-Declaration -> VAR ID : ARRAY < Type > ;
-Type -> ID 
+Program       -> Declaration EOF
+Declaration   -> VAR VariableList ;
+VariableList  -> Variable MaybeListTail
+MaybeListTail -> , VariableList
+MaybeListTail -> EPS
+Variable      -> ID : ID < Type >
+Type          -> ID 
 ```
+
+### FIRST
+
+A | First(A)
+-----|-------
+Program       |   VAR
+Declaration   |   VAR
+VariableList  |   ID
+MaybeListTail |   , EPS
+Variable      |   ID
+Type          |   ID
+
+### FOLLOW
+
+A | Follow(A)
+--|----------
+Program       |   EOF
+Declaration   |   EOF
+VariableList  |   ;
+MaybeListTail |   ;
+Variable      |   , ;
+Type          |   >
 
 ### Тесты
 

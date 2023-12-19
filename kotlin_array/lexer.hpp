@@ -34,6 +34,7 @@ public:
                         | PFW_LAZY(Parse<RANGLE>)
                         | PFW_LAZY(Parse<COLON>)
                         | PFW_LAZY(Parse<SEMICOLON>)
+                        | PFW_LAZY(Parse<COMMA>)
                         | PFW_LAZY(Parse<pfw::token::END>);
 
         auto variable_length = Parse<ID>()

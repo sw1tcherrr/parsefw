@@ -1,5 +1,1 @@
-var 
-   x : 
-    Array 
-  <Int>
-                ;
+var x : Array<Int>, y : Array<Double>, z : Array<Float>;

@@ -51,36 +51,70 @@ private:
         AddTokenChild(decl);
         NextToken();
 
-        PFW_TRY(this->template Expect<ID>());
-        AddTokenChild(decl);
-        NextToken();
-
-        PFW_TRY(this->template Expect<COLON>());
-        AddTokenChild(decl);
-        NextToken();
-
-        PFW_TRY(this->template Expect<ID>());
-        if (std::visit(pfw::token::GetStringValue, cur_token.value()) != "Array") {
-            return tl::unexpected(std::format("Expected Array type, got {}", cur_token.value()));
-        }
-        AddTokenChild(decl);
-        NextToken();
-
-        PFW_TRY(this->template Expect<LANGLE>());
-        AddTokenChild(decl);
-        NextToken();
-
-        PFW_TRY(decl.TryAddChild(Type()))
-
-        PFW_TRY(this->template Expect<RANGLE>());
-        AddTokenChild(decl);
-        NextToken();
+        PFW_TRY(decl.TryAddChild(VariableList()));
 
         PFW_TRY(this->template Expect<SEMICOLON>());
         AddTokenChild(decl);
         NextToken();
 
         return decl;
+    }
+
+    Result VariableList() {
+        NtNode list("VariableList");
+
+        PFW_TRY(list.TryAddChild(Variable()));
+
+        PFW_TRY(list.TryAddChild(MaybeListTail()));
+
+        return list;
+    }
+
+    Result MaybeListTail() {
+        NtNode tail("MaybeListTail");
+
+        if (this->template Expect<COMMA>()) {
+            AddTokenChild(tail);
+            NextToken();
+
+            PFW_TRY(tail.TryAddChild(VariableList()));
+        } else {
+            // MaybeListTail -> eps
+            PFW_TRY(this->template Expect<SEMICOLON>());
+            // check, but dont consume 
+        }
+        return tail;
+    }
+
+    Result Variable() {
+        NtNode var("Variable");
+
+        PFW_TRY(this->template Expect<ID>());
+        AddTokenChild(var);
+        NextToken();
+
+        PFW_TRY(this->template Expect<COLON>());
+        AddTokenChild(var);
+        NextToken();
+
+        PFW_TRY(this->template Expect<ID>());
+        if (std::visit(pfw::token::GetStringValue, cur_token.value()) != "Array") {
+            return tl::unexpected(std::format("Expected Array type, got {}", cur_token.value()));
+        }
+        AddTokenChild(var);
+        NextToken();
+
+        PFW_TRY(this->template Expect<LANGLE>());
+        AddTokenChild(var);
+        NextToken();
+
+        PFW_TRY(var.TryAddChild(Type()))
+
+        PFW_TRY(this->template Expect<RANGLE>());
+        AddTokenChild(var);
+        NextToken();
+
+        return var;
     }
 
     Result Type() {
