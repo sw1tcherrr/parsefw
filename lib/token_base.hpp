@@ -31,24 +31,13 @@ std::string_view GetStringValue(TokenBase const& t) {
     return t.string_value;
 }
 
-template <typename T>
-    requires std::integral<T> || std::floating_point<T>
-struct Numeric {
-    T numeric_value;
-};
-
-template <typename T, std::derived_from<Numeric<T>> Token>
-T GetNumericValue(Token const& t) {
-    return t.numeric_value;
-}
-
-#define PFW_TOKEN(NAME, PATTERN, ...)  \
-struct NAME : ::pfw::token::TokenBase, ##__VA_ARGS__ { \
+#define PFW_TOKEN(NAME, PATTERN)  \
+struct NAME : ::pfw::token::TokenBase { \
     static constexpr ctll::fixed_string kPattern = PATTERN; \
     static constexpr std::string_view kPatternStr = PATTERN; \
     static constexpr std::string_view kName = #NAME;\
     using Base = ::pfw::token::TokenBase; \
-    using Base::TokenBase; \
+    using Base::Base; \
 };
 
 PFW_TOKEN(END, "")

@@ -29,7 +29,7 @@ private:
     using Base::NextToken;
 
     void AddTokenChild(NtNode& n) {
-        n.AddChild(Node{TNode{this->cur_token}});
+        n.AddChild(Node{TNode{this->cur_token.value()}});
     }
 
     Result Declaration() {
@@ -64,7 +64,7 @@ private:
             return {Node(NtNode{"Args"})};
         }
 
-        return tl::unexpected(std::format("Expected ID or RPAREN, got {}\n", this->cur_token));
+        return tl::unexpected(std::format("Expected ID or RPAREN, got {}\n", this->cur_token.value()));
     }
 
     Result Arg() {
@@ -105,7 +105,7 @@ private:
             std::cout << "MaybeGeneric -> eps\n";
             return {Node(NtNode{"MaybeGeneric"})};
         }
-        return tl::unexpected(std::format("Expected LANGLE or RANGLE or COMMA or RPAREN or END, got {}\n", this->cur_token));
+        return tl::unexpected(std::format("Expected LANGLE or RANGLE or COMMA or RPAREN or END, got {}\n", this->cur_token.value()));
     }
 
     Result MaybeArgs() {
@@ -121,7 +121,7 @@ private:
             std::cout << "MaybeArgs -> eps\n";
             return {Node(NtNode{"MaybeArgs"})};
         }
-        return tl::unexpected(std::format("Expected COMMA or RPAREN, got {}\n", this->cur_token));
+        return tl::unexpected(std::format("Expected COMMA or RPAREN, got {}\n", this->cur_token.value()));
     }
 
     Result MaybeReturnType() {
@@ -137,7 +137,7 @@ private:
             std::cout << "MaybeReturnType -> eps\n";
             return {Node(NtNode{"MaybeReturnType"})};
         }
-        return tl::unexpected(std::format("Expected COLON or END, got {}\n", this->cur_token));
+        return tl::unexpected(std::format("Expected COLON or END, got {}\n", this->cur_token.value()));
     }
 };
 }  // namespace language::kotlin_func

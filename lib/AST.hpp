@@ -17,6 +17,10 @@ struct TokenNode {
     explicit TokenNode(Token tok) : m_tok(std::move(tok)) {
     }
 
+    std::string GetStringValue() const {
+        return std::visit(m_tok, token::GetStringValue);
+    }
+
     [[nodiscard]]
     bool IsTerminal() const {
         return true;
@@ -81,6 +85,10 @@ struct NonterminalNode {
     std::span<LangNode> Children() & {
         return m_children;
     }
+
+    // std::string GetStringValue() const {
+    //     return "";
+    // }
 
     tl::expected<std::monostate, std::string> TryAddChild(tl::expected<LangNode, std::string>&& maybe_child) {
         if (!maybe_child) {
@@ -147,6 +155,10 @@ struct LangNodeBase {
     std::span<LangNode> Children() & {
         return Visit([](auto& v) { return v.Children(); });
     }
+
+    // std::string GetStringValue() const {
+    //     return Visit([](auto& v) { return v.GetStringValue(); });
+    // }
 
     bool operator==(LangNodeBase const& other) const {
         bool res = value == other.value;
