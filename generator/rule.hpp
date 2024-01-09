@@ -26,11 +26,11 @@ struct RuleRef {
     std::vector<Arg> args;
 };
 
-using RuleElement = std::variant<RuleRef, Token, Action>;
-using Production  = std::vector<RuleElement>;
-using Variants    = std::vector<Production>;
-using Synts       = std::vector<Attribute>;
-using Inherits    = std::vector<Attribute>;
+using ProductionElement = std::variant<RuleRef, Token, Action>;
+using Production        = std::vector<ProductionElement>;
+using Variants          = std::vector<Production>;
+using Synts             = std::vector<Attribute>;
+using Inherits          = std::vector<Attribute>;
 
 struct Rule {
     std::string name;
