@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <variant>
 #include "rule.hpp"
-#include "../lib/util.hpp"
+#include <pfw/util.hpp>
 
 struct Grammar {
     using RuleMap   = std::unordered_map<std::string, Rule>;
@@ -69,7 +69,7 @@ struct Grammar {
 	}
 
 	void MakeFollow() {
-		FOLLOW[start].insert("EOF");
+		FOLLOW[start].insert("END");
 		bool changed = true;
 		while (changed) {
 			changed = false;

@@ -17,8 +17,8 @@ struct TokenNode {
     explicit TokenNode(Token tok) : m_tok(std::move(tok)) {
     }
 
-    std::string GetStringValue() const {
-        return std::visit(m_tok, token::GetStringValue);
+    std::string_view GetStringValue() const {
+        return std::visit(token::GetStringValue, m_tok);
     }
 
     [[nodiscard]]

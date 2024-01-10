@@ -27,7 +27,7 @@ struct TokenBase {
     }
 };
 
-std::string_view GetStringValue(TokenBase const& t) {
+inline std::string_view GetStringValue(TokenBase const& t) {
     return t.string_value;
 }
 

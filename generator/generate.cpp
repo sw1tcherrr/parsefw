@@ -1,16 +1,12 @@
+#include <cctype>
 #include <string>
 #include <unordered_map>
 #include <format>
 #include <iostream>
 
+#include "generator.hpp"
 #include "rule.hpp"
 #include "grammar.hpp"
-
-// #include "../lib/token_base.hpp"
-
-// PFW_TOKEN(PLUS,   R"(+)")
-// PFW_TOKEN(LPAREN, R"(\()")
-// PFW_TOKEN(RPAREN, R"(\))")
 
 int main() {
     auto e = Rule{
@@ -20,7 +16,8 @@ int main() {
         Variants{
             Production{
                 RuleRef{"T", {}},
-                RuleRef{"Ep", {}}
+                RuleRef{"Ep", {Arg{"_1.val"}}},
+                Action{"_0.val = _2.val;"}
             }
         }
     };
@@ -32,10 +29,11 @@ int main() {
             Production{
                 Token{"PLUS"}, 
                 RuleRef{"T", {}},
-                RuleRef{"Ep", {Arg{"acc + _1.val"}}},
+                RuleRef{"Ep", {Arg{"acc + _2.val"}}},
                 Action{"_0.val = _3.val;"},
             },
             Production{
+                Action{"_0.val = acc;"}
             }
         }, 
     };
@@ -52,13 +50,12 @@ int main() {
             },
             Production{
                 Token{"NUM"},
-                Action{"_0.val = std::atoi(_1.GetStringValue());"}
+                Action{"_0.val = std::atoi(_1.GetStringValue().data());"}
             }
         },
     };
 
     std::unordered_map<std::string, Rule> map = {{"E", e}, {"Ep", ep}, {"T", t}};
-    //std::cout << std::format("Result {}({}) {{\n", map["Ep"].name, map["Ep"].args[0].type + " " + map["Ep"].args[0].name);
 
     Grammar g(std::move(map), "E");
     std::cout << "FIRST\n";
@@ -77,4 +74,11 @@ int main() {
         }
         std::cout << "\n";
     }
+
+    std::unordered_map<std::string, std::string> tokens = {{"PLUS", R"(\+)"}, {"LPAREN", R"(\()"}, {"RPAREN", R"(\))"}, {"NUM", "[0-9]+"}}; 
+    Generator gen(g, tokens, "[](unsigned char c) { return std::isspace(c); }", "calc");
+    gen.GenerateToken();
+    gen.GenerateLexer();
+    gen.GenerateAST();
+    gen.GenerateParser();
 }
