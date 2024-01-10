@@ -3,8 +3,8 @@
 #include <concepts>
 #include <variant>
 
-#include "../lib/AST.hpp"
-#include "../lib/graphviz.hpp"
+#include <pfw/AST.hpp>
+#include <pfw/graphviz.hpp>
 #include "token.hpp"
 
 namespace language::kotlin_func::ast {

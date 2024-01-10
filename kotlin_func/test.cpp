@@ -1,8 +1,8 @@
 #include <iostream>
 #include <ostream>
 
-#include <AST.hpp>
-#include <util.hpp>
+#include <pfw/AST.hpp>
+#include <pfw/util.hpp>
 #include "parser.hpp"
 
 #include <gtest/gtest.h>

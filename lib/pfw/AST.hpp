@@ -98,8 +98,8 @@ struct NonterminalNode {
         return {};
     }
 
-    NonterminalNode& AddChild(LangNode&& child) {
-        m_children.push_back(std::move(child));
+    NonterminalNode& AddChild(LangNode const& child) {
+        m_children.push_back(child);
         return *this;
     }
 

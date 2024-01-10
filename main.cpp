@@ -4,8 +4,8 @@
 #include "kotlin_array/lexer.hpp"
 #include "kotlin_array/parser.hpp"
 #include "kotlin_array/token.hpp"
-#include "lib/graphviz.hpp"
-#include "lib/mmap_buffer.hpp"
+#include <pfw/graphviz.hpp>
+#include <pfw/mmap_buffer.hpp>
 
 int main() {
     using namespace kotlin_array;

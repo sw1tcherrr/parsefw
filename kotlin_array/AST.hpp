@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../lib/AST.hpp"
-#include "../lib/graphviz.hpp"
+#include <pfw/AST.hpp>
+#include <pfw/graphviz.hpp>
 #include "token.hpp"
 
 namespace kotlin_array {

@@ -1,10 +1,3 @@
-Примеры:
-
-- [ ] токен инта, флоата
-- [ ] аттрибутно транслирующий калькулятор
-- [ ] добавить в грамматику kotlin_func дженерик со многими параметрами `T<K, V, W>`
-- [ ] добавить в грамматику kotlin_func дефолтное значение параметра (инт) `f(a: T = 5)`
-
 Core:
 
 - [x] аналог LLVM MemoryBuffer - обертка над готовым буфером (строкой), или memory mapped файлом => дает bidirectional итераторы
@@ -23,7 +16,7 @@ Core:
 - [x] конструкторы для токенов от string_value и тп
 - [x] не бросать в NextToken
 - [ ] ? шаблон вместо макроса PFW_TOKEN
-- [ ] cmake и структура папок (target_include_directories)
+- [x] cmake и структура папок (target_include_directories)
 - [ ] camelCase для функций в clang tidy
 
 Тесты:

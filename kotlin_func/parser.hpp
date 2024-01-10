@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../lib/parser_base.hpp"
-#include "../lib/util.hpp"
+#include <pfw/parser_base.hpp>
+#include <pfw/util.hpp>
 #include "AST.hpp"
 #include "lexer.hpp"
 #include "token.hpp"

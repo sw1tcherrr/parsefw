@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../lib/token_base.hpp"
+#include <pfw/token_base.hpp>
 
 namespace kotlin_array {
 

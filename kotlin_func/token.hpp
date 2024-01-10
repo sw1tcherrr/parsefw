@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include <variant>
 
-#include "../lib/token_base.hpp"
+#include <pfw/token_base.hpp>
 
 namespace language::kotlin_func {
 

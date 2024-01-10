@@ -1,8 +1,8 @@
 #include <iostream>
 #include <ostream>
 
-#include "../lib/AST.hpp"
-#include "../lib/util.hpp"
+#include <pfw/AST.hpp>
+#include <pfw/util.hpp>
 #include "AST.hpp"
 #include "parser.hpp"
 #include "token.hpp"

@@ -6,9 +6,9 @@
 #include <string_view>
 #include <tl/expected.hpp>
 
-#include "../lib/lexer_base.hpp"
-#include "../lib/util.hpp"
-#include "../lib/token_base.hpp"
+#include <pfw/lexer_base.hpp>
+#include <pfw/util.hpp>
+#include <pfw/token_base.hpp>
 #include "token.hpp"
 
 namespace kotlin_array {

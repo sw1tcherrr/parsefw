@@ -11,7 +11,10 @@ find_package(GTest CONFIG REQUIRED)
 add_executable(playground main.cpp)
 
 target_link_libraries(playground PRIVATE ctre::ctre tl::expected)
+target_include_directories(playground PRIVATE lib)
 
 add_subdirectory(kotlin_func)
 add_subdirectory(kotlin_array)
 add_subdirectory(generator)
+
+add_subdirectory(calculator)
