@@ -4,6 +4,7 @@ MUL : {\*} ;
 DIV : {\/} ;
 LPAREN : {\(};
 RPAREN : {\)} ;
+BANG : {!} ;
 NUM : {[0-9]+} ;
 
 skip : { [](unsigned char c) { return std::isspace(c); } } ;

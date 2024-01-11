@@ -184,6 +184,61 @@ struct Parser : pfw::ParserBase<I, Lexer<I>, Token> {
 	
 	Result<factorNode> factor() {
 		factorNode _0;
+		if (this->template Expect<LPAREN>() || this->template Expect<NUM>()) {
+			auto res1 = atom();
+			PFW_TRY(res1)
+			auto _1 = res1.value();
+			_0.AddChild(_1);
+			
+			auto res2 = factorTail(_1.val);
+			PFW_TRY(res2)
+			auto _2 = res2.value();
+			_0.AddChild(_2);
+			
+			_0.val = _2.val;
+			
+			return _0;
+		}
+		
+		PFW_TRY(cur_token)
+		return tl::unexpected(std::format("Unexpected token {}\n", cur_token.value()));
+	}
+	
+	Result<factorTailNode> factorTail(int acc) {
+		factorTailNode _0;
+		if (this->template Expect<BANG>()) {
+			PFW_TRY(this->template Expect<BANG>())
+			auto _1 = _TokenNode(cur_token.value());
+			_0.AddChild(_1);
+			NextToken();
+			
+			 int fact = 1; 
+                                                for (int i = 1; i <= acc; ++i) {
+                                                    fact *= i;
+                                                }
+                                              
+			
+			auto res3 = factorTail(fact);
+			PFW_TRY(res3)
+			auto _3 = res3.value();
+			_0.AddChild(_3);
+			
+			_0.val = _3.val;
+			
+			return _0;
+		}
+		if (this->template Expect<DIV>() || this->template Expect<MUL>() || this->template Expect<END>() || this->template Expect<PLUS>() || this->template Expect<MINUS>() || this->template Expect<RPAREN>()) {
+			_0.val = acc;
+			
+			return _0;
+		}
+		
+		PFW_TRY(cur_token)
+		return tl::unexpected(std::format("Unexpected token {}\n", cur_token.value()));
+	}
+	
+	Result<atomNode> atom() {
+		atomNode _0;
 		if (this->template Expect<LPAREN>()) {
 			PFW_TRY(this->template Expect<LPAREN>())
 			auto _1 = _TokenNode(cur_token.value());

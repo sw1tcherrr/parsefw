@@ -68,6 +68,13 @@ struct Lexer : pfw::LexerBase<I> {
 		}
 		
 		{
+			auto res = Parse<BANG>();
+			if (res && (!best_token || std::visit(pfw::token::GetStringValue, res.value()).size() > std::visit(pfw::token::GetStringValue, best_token.value()).size())) {
+				best_token = res;
+			}
+		}
+		
+		{
 			auto res = Parse<NUM>();
 			if (res && (!best_token || std::visit(pfw::token::GetStringValue, res.value()).size() > std::visit(pfw::token::GetStringValue, best_token.value()).size())) {
 				best_token = res;

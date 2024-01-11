@@ -48,15 +48,33 @@ struct factorNodeT : pfw::ast::NonterminalNode<LangNode> {
 	int val;
 };
 
+template <typename LangNode>
+struct factorTailNodeT : pfw::ast::NonterminalNode<LangNode> {
+	factorTailNodeT() : pfw::ast::NonterminalNode<LangNode>("factorTail") {
+	}
+	
+	int val;
+};
+
+template <typename LangNode>
+struct atomNodeT : pfw::ast::NonterminalNode<LangNode> {
+	atomNodeT() : pfw::ast::NonterminalNode<LangNode>("atom") {
+	}
+	
+	int val;
+};
+
 using exprNode = exprNodeT<Node>;
 using exprTailNode = exprTailNodeT<Node>;
 using termNode = termNodeT<Node>;
 using termTailNode = termTailNodeT<Node>;
 using factorNode = factorNodeT<Node>;
+using factorTailNode = factorTailNodeT<Node>;
+using atomNode = atomNodeT<Node>;
 using _TokenNode = pfw::ast::TokenNode<Token, Node>;
 using _NtNode = pfw::ast::NonterminalNode<Node>;
 
-using Base = pfw::ast::LangNodeBase<Node, exprNode, exprTailNode, termNode, termTailNode, factorNode, _TokenNode>;
+using Base = pfw::ast::LangNodeBase<Node, exprNode, exprTailNode, termNode, termTailNode, factorNode, factorTailNode, atomNode, _TokenNode>;
 
 struct Node : Base, pfw::graphviz::GraphvizNode<Node> {
 	using Base::Base;

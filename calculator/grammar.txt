@@ -10,5 +10,16 @@ termTail [int acc] returns [int val] : MUL factor termTail[{acc * _2.val}] {_0.v
                                      | DIV factor termTail[{acc / _2.val}] {_0.val = _3.val;}
                                      | {_0.val = acc;} ;
 
-factor returns [int val] : LPAREN expr RPAREN {_0.val = _2.val;}
-                         | NUM {_0.val = std::atoi(_1.GetStringValue().data());} ;
+factor returns [int val] : atom factorTail[{_1.val}] {_0.val = _2.val;};
+
+factorTail [int acc] returns [int val] : BANG { int fact = 1; 
+                                                for (int i = 1; i <= acc; ++i) {
+                                                    fact *= i;
+                                                }
+                                              }
+                                        factorTail[{fact}]
+                                        {_0.val = _3.val;}
+                                       | {_0.val = acc;} ;
+
+atom returns [int val] : LPAREN expr RPAREN {_0.val = _2.val;}
+                       | NUM {_0.val = std::atoi(_1.GetStringValue().data());} ;
