@@ -5,7 +5,10 @@
 #include <fstream>
 #include <string>
 #include "grammar.hpp"
+#include "pfw/util.hpp"
 #include "rule.hpp"
+
+namespace pfw::gen {
 
 struct Coder {
     std::ofstream out;
@@ -60,14 +63,15 @@ private:
 
 struct Generator {
     Grammar g;
-    std::unordered_map<std::string, std::string> tokens;
+    std::vector<std::pair<std::string, std::string>> tokens;
     std::string skip;
     std::string ns;
+    std::string out;
 
     #define fmt std::format
 
     void GenerateToken() {
-        Coder c(std::ofstream("token.hpp"));
+        Coder c(std::ofstream(fmt("{}/token.hpp", out)));
 
         c.Line("#pragma once");
         c.Line();
@@ -90,7 +94,7 @@ struct Generator {
     }
 
     void GenerateLexer() {
-        Coder c(std::ofstream("lexer.hpp"));
+        Coder c(std::ofstream(fmt("{}/lexer.hpp", out)));
 
         c.Line("#pragma once");
         c.Line();
@@ -163,7 +167,7 @@ struct Generator {
     }
 
     void GenerateAST() {
-        Coder c(std::ofstream("AST.hpp"));
+        Coder c(std::ofstream(fmt("{}/AST.hpp", out)));
 
         c.Line("#pragma once");
         c.Line();
@@ -176,7 +180,8 @@ struct Generator {
         c.Line("struct Node;");
         c.Line();
 
-        for (auto const& [name, rule] : g.rules) {
+        for (auto const& rule : g.rules) {
+            auto const& name = rule.name;
             c.Line("template <typename LangNode>");
             c.Struct("struct " + name + "NodeT : pfw::ast::NonterminalNode<LangNode>", [&]() {
                 c.Scope(name + "NodeT() : pfw::ast::NonterminalNode<LangNode>(\"" + name + "\")", [](){});
@@ -189,7 +194,8 @@ struct Generator {
         }
 
         std::string base = "using Base = pfw::ast::LangNodeBase<Node, ";
-        for (auto const& [name, _] : g.rules) {
+        for (auto const& rule : g.rules) {
+            auto const& name = rule.name;
             base += name + "Node, ";
             c.Line("using " + name + "Node" + " = " + name + "NodeT<Node>;");
         }
@@ -207,7 +213,7 @@ struct Generator {
     }
 
     void GenerateParser() {
-        Coder c(std::ofstream("parser.hpp"));
+        Coder c(std::ofstream(fmt("{}/parser.hpp", out)));
 
         c.Line("#pragma once");
         c.Line();
@@ -249,7 +255,8 @@ struct Generator {
             c.Line("private:");
             c.Line();
 
-            for (auto const& [name, rule] : g.rules) {
+            for (auto const& rule : g.rules) {
+                auto const& name = rule.name;
                 c.Scope(fmt("Result<{}Node> {}({})", name, name, MakeArgDecl(rule)), [&]() {
                     c.Line(fmt("{}Node _0;", name));
                     for (auto const& production : rule.variants) {
@@ -282,7 +289,9 @@ struct Generator {
                             c.Line("return _0;");
                         });
                     }
-                    c.Line("return tl::unexpected(std::format(\"Unexpected token {}\\n\", this->cur_token.value()));");
+                    c.Line();
+                    c.Line("PFW_TRY(cur_token)");
+                    c.Line("return tl::unexpected(std::format(\"Unexpected token {}\\n\", cur_token.value()));");
                 });
                 c.Line();
             }
@@ -302,7 +311,7 @@ struct Generator {
         return res;
     }
 
-    std::string MakeCondition(std::string_view name, Production const& prod) {
+    std::string MakeCondition(std::string const& name, Production const& prod) {
         auto first1 = g.First(prod.begin(), prod.end());
         if (first1.contains("EPS")) {
             first1.erase("EPS");
@@ -331,3 +340,5 @@ struct Generator {
 
     #undef fmt
 };
+
+} // namespace pfw::gen

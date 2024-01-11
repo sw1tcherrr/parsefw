@@ -3,6 +3,7 @@
   "dependencies": [
     "ctre",
     "tl-expected",
-    "gtest"
+    "gtest",
+    "antlr4"
   ]
 }

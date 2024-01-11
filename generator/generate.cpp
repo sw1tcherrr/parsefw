@@ -4,60 +4,45 @@
 #include <format>
 #include <iostream>
 
+#include <pfw/util.hpp>
 #include "generator.hpp"
 #include "rule.hpp"
 #include "grammar.hpp"
 
-int main() {
-    auto e = Rule{
-        "E", 
-        Inherits{},
-        Synts{Attribute{"int", "val"}},
-        Variants{
-            Production{
-                RuleRef{"T", {}},
-                RuleRef{"Ep", {Arg{"_1.val"}}},
-                Action{"_0.val = _2.val;"}
-            }
-        }
-    };
-    auto ep = Rule{
-        "Ep", 
-        Inherits{Attribute{"int", "acc"}},
-        Synts{Attribute{"int", "val"}},
-        Variants{
-            Production{
-                Token{"PLUS"}, 
-                RuleRef{"T", {}},
-                RuleRef{"Ep", {Arg{"acc + _2.val"}}},
-                Action{"_0.val = _3.val;"},
-            },
-            Production{
-                Action{"_0.val = acc;"}
-            }
-        }, 
-    };
-    auto t = Rule{
-        "T",
-        Inherits{},
-        Synts{Attribute{"int", "val"}},
-        Variants{
-            Production{
-                Token{"LPAREN"}, 
-                RuleRef{"E", {}}, 
-                Token{"RPAREN"},
-                Action{"_0.val = _2.val;"}
-            },
-            Production{
-                Token{"NUM"},
-                Action{"_0.val = std::atoi(_1.GetStringValue().data());"}
-            }
-        },
-    };
+#include <GrammarParser.h>
+#include <GrammarLexer.h>
+#include <TokensLexer.h>
+#include <TokensParser.h>
+#include <antlr4-runtime.h>
 
-    std::unordered_map<std::string, Rule> map = {{"E", e}, {"Ep", ep}, {"T", t}};
+using namespace pfw::gen;
 
-    Grammar g(std::move(map), "E");
+int main(int argc, char** argv) {
+    if (argc != 5) {
+        std::cout << "Usage: generator <namespace> <grammar file> <token file> <output dir>\n";
+    }
+
+    std::string_view ns    = argv[1];
+    std::string_view gfile = argv[2];
+    std::string_view tfile = argv[3];
+    std::string_view out   = argv[4];
+
+    std::ifstream grammar_file(gfile.data());
+    antlr4::ANTLRInputStream grammar_input(grammar_file);
+    GrammarLexer grammar_lexer(&grammar_input);
+    antlr4::CommonTokenStream grammar_token_stream(&grammar_lexer);
+    GrammarParser grammar_parser(&grammar_token_stream);
+
+    std::ifstream tokens_file(tfile.data());
+    antlr4::ANTLRInputStream tokens_input(tokens_file);
+    TokensLexer tokens_lexer(&tokens_input);
+    antlr4::CommonTokenStream tokens_token_stream(&tokens_lexer);
+    TokensParser tokens_parser(&tokens_token_stream);
+
+    grammar_parser.grammar_();
+    tokens_parser.grammar_();
+    Grammar g(std::move(grammar_parser.rules), std::move(grammar_parser.start));
+
     std::cout << "FIRST\n";
     for (auto const& [k, v] : g.FIRST) {
         std::cout << k << " : ";
@@ -75,8 +60,42 @@ int main() {
         std::cout << "\n";
     }
 
-    std::unordered_map<std::string, std::string> tokens = {{"PLUS", R"(\+)"}, {"LPAREN", R"(\()"}, {"RPAREN", R"(\))"}, {"NUM", "[0-9]+"}}; 
-    Generator gen(g, tokens, "[](unsigned char c) { return std::isspace(c); }", "calc");
+    std::cout << "\nstarting rule: " << g.start << "\n\n";
+
+    for (auto const& rule : g.rules) {
+        std::cout << rule.name << ": \n";
+        std::cout << "\targs:\n";
+        for (auto const& arg : rule.args) {
+            std::cout << "\t\t" << arg.type << " " << arg.name << "\n";
+        }
+        std::cout << "\tattrs:\n";
+        for (auto const& attr : rule.attrs) {
+            std::cout << "\t\t" << attr.type << " " << attr.name << "\n";
+        }
+        std::cout << "\tvariants:\n";
+        for (auto const& p : rule.variants) {
+            std::cout << "\t\tproduction:\n";
+            for (auto const& e : p) {
+                std::visit(pfw::util::overloaded {
+                    [](RuleRef const& r) { 
+                        std::cout << "\t\t\tRuleRef " << r.name << "\n";
+                        for (auto const& arg : r.args) {
+                            std::cout << "\t\t\t\t" << arg.code << "\n";
+                        }
+                    },
+                    [](Token const& t) { std::cout << "\t\t\tToken " << t.name << "\n"; },
+                    [](Action const& a) { std::cout << "\t\t\tAction " << a.code << "\n"; },
+                }, e);
+            }
+        }
+    }
+
+    std::cout << "tokens:\n";
+    for (auto const& [k, v] : tokens_parser.map) {
+        std::cout << k << " " << v << "\n";
+    }
+
+    Generator gen(g, std::move(tokens_parser.map), std::move(tokens_parser.skip_predicate), std::string(ns), std::string(out));
     gen.GenerateToken();
     gen.GenerateLexer();
     gen.GenerateAST();
