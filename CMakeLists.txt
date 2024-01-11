@@ -18,3 +18,4 @@ add_subdirectory(kotlin_array)
 add_subdirectory(generator)
 
 add_subdirectory(calculator)
+add_subdirectory(kotlin_array_gen)

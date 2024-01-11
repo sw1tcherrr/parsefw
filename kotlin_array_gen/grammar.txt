@@ -1,0 +1,6 @@
+program       : declaration END ;
+declaration   : VAR variableList SEMICOLON ;
+variableList  : variable maybeListTail ;
+maybeListTail : COMMA variableList | ;
+variable      : ID COLON ID LANGLE type RANGLE ;
+type          : ID ;
