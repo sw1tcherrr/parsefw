@@ -1,0 +1,14 @@
+expr returns [int val] : term exprTail[{_1.val}] {_0.val = _2.val;} ;
+
+exprTail [int acc] returns [int val] : PLUS term exprTail[{acc + _2.val}] {_0.val = _3.val;}
+                                     | MINUS term exprTail[{acc - _2.val}] {_0.val = _3.val;}
+                                     | {_0.val = acc;} ;
+
+term returns [int val] : factor termTail[{_1.val}] {_0.val = _2.val;} ;
+
+termTail [int acc] returns [int val] : MUL factor termTail[{acc * _2.val}] {_0.val = _3.val;}
+                                     | DIV factor termTail[{acc / _2.val}] {_0.val = _3.val;}
+                                     | {_0.val = acc;} ;
+
+factor returns [int val] : LPAREN expr RPAREN {_0.val = _2.val;}
+                         | NUM {_0.val = std::atoi(_1.GetStringValue().data());} ;

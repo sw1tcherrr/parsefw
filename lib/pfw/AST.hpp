@@ -156,6 +156,10 @@ struct LangNodeBase {
         return Visit([](auto& v) { return v.Children(); });
     }
 
+    std::variant<Nodes...> const& Value() const {
+        return value;
+    }
+
     // std::string GetStringValue() const {
     //     return Visit([](auto& v) { return v.GetStringValue(); });
     // }

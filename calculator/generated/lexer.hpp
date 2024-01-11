@@ -22,18 +22,32 @@ struct Lexer : pfw::LexerBase<I> {
 	Lexer(I begin, I end) : Base(std::move(begin), std::move(end)) {
 	}
 	tl::expected<Token, std::string> NextToken() {
-		Base::Skip([](unsigned char c) { return std::isspace(c); });
+		Base::Skip( [](unsigned char c) { return std::isspace(c); } );
 		
 		std::optional<Token> best_token;
 		{
-			auto res = Parse<NUM>();
+			auto res = Parse<PLUS>();
 			if (res && (!best_token || std::visit(pfw::token::GetStringValue, res.value()).size() > std::visit(pfw::token::GetStringValue, best_token.value()).size())) {
 				best_token = res;
 			}
 		}
 		
 		{
-			auto res = Parse<RPAREN>();
+			auto res = Parse<MINUS>();
+			if (res && (!best_token || std::visit(pfw::token::GetStringValue, res.value()).size() > std::visit(pfw::token::GetStringValue, best_token.value()).size())) {
+				best_token = res;
+			}
+		}
+		
+		{
+			auto res = Parse<MUL>();
+			if (res && (!best_token || std::visit(pfw::token::GetStringValue, res.value()).size() > std::visit(pfw::token::GetStringValue, best_token.value()).size())) {
+				best_token = res;
+			}
+		}
+		
+		{
+			auto res = Parse<DIV>();
 			if (res && (!best_token || std::visit(pfw::token::GetStringValue, res.value()).size() > std::visit(pfw::token::GetStringValue, best_token.value()).size())) {
 				best_token = res;
 			}
@@ -47,7 +61,14 @@ struct Lexer : pfw::LexerBase<I> {
 		}
 		
 		{
-			auto res = Parse<PLUS>();
+			auto res = Parse<RPAREN>();
+			if (res && (!best_token || std::visit(pfw::token::GetStringValue, res.value()).size() > std::visit(pfw::token::GetStringValue, best_token.value()).size())) {
+				best_token = res;
+			}
+		}
+		
+		{
+			auto res = Parse<NUM>();
 			if (res && (!best_token || std::visit(pfw::token::GetStringValue, res.value()).size() > std::visit(pfw::token::GetStringValue, best_token.value()).size())) {
 				best_token = res;
 			}

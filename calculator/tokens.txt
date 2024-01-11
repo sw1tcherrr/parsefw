@@ -1,0 +1,9 @@
+PLUS : {\+} ; 
+MINUS : {\-} ;
+MUL : {\*} ;
+DIV : {\/} ;
+LPAREN : {\(};
+RPAREN : {\)} ;
+NUM : {[0-9]+} ;
+
+skip : { [](unsigned char c) { return std::isspace(c); } } ;

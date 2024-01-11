@@ -9,36 +9,54 @@ namespace calc {
 struct Node;
 
 template <typename LangNode>
-struct TNodeT : pfw::ast::NonterminalNode<LangNode> {
-	TNodeT() : pfw::ast::NonterminalNode<LangNode>("T") {
+struct exprNodeT : pfw::ast::NonterminalNode<LangNode> {
+	exprNodeT() : pfw::ast::NonterminalNode<LangNode>("expr") {
 	}
 	
 	int val;
 };
 
 template <typename LangNode>
-struct EpNodeT : pfw::ast::NonterminalNode<LangNode> {
-	EpNodeT() : pfw::ast::NonterminalNode<LangNode>("Ep") {
+struct exprTailNodeT : pfw::ast::NonterminalNode<LangNode> {
+	exprTailNodeT() : pfw::ast::NonterminalNode<LangNode>("exprTail") {
 	}
 	
 	int val;
 };
 
 template <typename LangNode>
-struct ENodeT : pfw::ast::NonterminalNode<LangNode> {
-	ENodeT() : pfw::ast::NonterminalNode<LangNode>("E") {
+struct termNodeT : pfw::ast::NonterminalNode<LangNode> {
+	termNodeT() : pfw::ast::NonterminalNode<LangNode>("term") {
 	}
 	
 	int val;
 };
 
-using TNode = TNodeT<Node>;
-using EpNode = EpNodeT<Node>;
-using ENode = ENodeT<Node>;
+template <typename LangNode>
+struct termTailNodeT : pfw::ast::NonterminalNode<LangNode> {
+	termTailNodeT() : pfw::ast::NonterminalNode<LangNode>("termTail") {
+	}
+	
+	int val;
+};
+
+template <typename LangNode>
+struct factorNodeT : pfw::ast::NonterminalNode<LangNode> {
+	factorNodeT() : pfw::ast::NonterminalNode<LangNode>("factor") {
+	}
+	
+	int val;
+};
+
+using exprNode = exprNodeT<Node>;
+using exprTailNode = exprTailNodeT<Node>;
+using termNode = termNodeT<Node>;
+using termTailNode = termTailNodeT<Node>;
+using factorNode = factorNodeT<Node>;
 using _TokenNode = pfw::ast::TokenNode<Token, Node>;
 using _NtNode = pfw::ast::NonterminalNode<Node>;
 
-using Base = pfw::ast::LangNodeBase<Node, TNode, EpNode, ENode, _TokenNode>;
+using Base = pfw::ast::LangNodeBase<Node, exprNode, exprTailNode, termNode, termTailNode, factorNode, _TokenNode>;
 
 struct Node : Base, pfw::graphviz::GraphvizNode<Node> {
 	using Base::Base;

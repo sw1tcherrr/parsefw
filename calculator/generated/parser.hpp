@@ -27,22 +27,170 @@ struct Parser : pfw::ParserBase<I, Lexer<I>, Token> {
 	
 	Result<Node> Parse() {
 		NextToken();
-		auto res = E();
+		auto res = expr();
 		PFW_TRY(res)
 		return Node(res.value());
 	}
 	
 	private:
 	
-	Result<TNode> T() {
-		TNode _0;
+	Result<exprNode> expr() {
+		exprNode _0;
+		if (this->template Expect<LPAREN>() || this->template Expect<NUM>()) {
+			auto res1 = term();
+			PFW_TRY(res1)
+			auto _1 = res1.value();
+			_0.AddChild(_1);
+			
+			auto res2 = exprTail(_1.val);
+			PFW_TRY(res2)
+			auto _2 = res2.value();
+			_0.AddChild(_2);
+			
+			_0.val = _2.val;
+			
+			return _0;
+		}
+		
+		PFW_TRY(cur_token)
+		return tl::unexpected(std::format("Unexpected token {}\n", cur_token.value()));
+	}
+	
+	Result<exprTailNode> exprTail(int acc) {
+		exprTailNode _0;
+		if (this->template Expect<PLUS>()) {
+			PFW_TRY(this->template Expect<PLUS>())
+			auto _1 = _TokenNode(cur_token.value());
+			_0.AddChild(_1);
+			NextToken();
+			
+			auto res2 = term();
+			PFW_TRY(res2)
+			auto _2 = res2.value();
+			_0.AddChild(_2);
+			
+			auto res3 = exprTail(acc + _2.val);
+			PFW_TRY(res3)
+			auto _3 = res3.value();
+			_0.AddChild(_3);
+			
+			_0.val = _3.val;
+			
+			return _0;
+		}
+		if (this->template Expect<MINUS>()) {
+			PFW_TRY(this->template Expect<MINUS>())
+			auto _1 = _TokenNode(cur_token.value());
+			_0.AddChild(_1);
+			NextToken();
+			
+			auto res2 = term();
+			PFW_TRY(res2)
+			auto _2 = res2.value();
+			_0.AddChild(_2);
+			
+			auto res3 = exprTail(acc - _2.val);
+			PFW_TRY(res3)
+			auto _3 = res3.value();
+			_0.AddChild(_3);
+			
+			_0.val = _3.val;
+			
+			return _0;
+		}
+		if (this->template Expect<END>() || this->template Expect<RPAREN>()) {
+			_0.val = acc;
+			
+			return _0;
+		}
+		
+		PFW_TRY(cur_token)
+		return tl::unexpected(std::format("Unexpected token {}\n", cur_token.value()));
+	}
+	
+	Result<termNode> term() {
+		termNode _0;
+		if (this->template Expect<LPAREN>() || this->template Expect<NUM>()) {
+			auto res1 = factor();
+			PFW_TRY(res1)
+			auto _1 = res1.value();
+			_0.AddChild(_1);
+			
+			auto res2 = termTail(_1.val);
+			PFW_TRY(res2)
+			auto _2 = res2.value();
+			_0.AddChild(_2);
+			
+			_0.val = _2.val;
+			
+			return _0;
+		}
+		
+		PFW_TRY(cur_token)
+		return tl::unexpected(std::format("Unexpected token {}\n", cur_token.value()));
+	}
+	
+	Result<termTailNode> termTail(int acc) {
+		termTailNode _0;
+		if (this->template Expect<MUL>()) {
+			PFW_TRY(this->template Expect<MUL>())
+			auto _1 = _TokenNode(cur_token.value());
+			_0.AddChild(_1);
+			NextToken();
+			
+			auto res2 = factor();
+			PFW_TRY(res2)
+			auto _2 = res2.value();
+			_0.AddChild(_2);
+			
+			auto res3 = termTail(acc * _2.val);
+			PFW_TRY(res3)
+			auto _3 = res3.value();
+			_0.AddChild(_3);
+			
+			_0.val = _3.val;
+			
+			return _0;
+		}
+		if (this->template Expect<DIV>()) {
+			PFW_TRY(this->template Expect<DIV>())
+			auto _1 = _TokenNode(cur_token.value());
+			_0.AddChild(_1);
+			NextToken();
+			
+			auto res2 = factor();
+			PFW_TRY(res2)
+			auto _2 = res2.value();
+			_0.AddChild(_2);
+			
+			auto res3 = termTail(acc / _2.val);
+			PFW_TRY(res3)
+			auto _3 = res3.value();
+			_0.AddChild(_3);
+			
+			_0.val = _3.val;
+			
+			return _0;
+		}
+		if (this->template Expect<MINUS>() || this->template Expect<PLUS>() || this->template Expect<END>() || this->template Expect<RPAREN>()) {
+			_0.val = acc;
+			
+			return _0;
+		}
+		
+		PFW_TRY(cur_token)
+		return tl::unexpected(std::format("Unexpected token {}\n", cur_token.value()));
+	}
+	
+	Result<factorNode> factor() {
+		factorNode _0;
 		if (this->template Expect<LPAREN>()) {
 			PFW_TRY(this->template Expect<LPAREN>())
 			auto _1 = _TokenNode(cur_token.value());
 			_0.AddChild(_1);
 			NextToken();
 			
-			auto res2 = E();
+			auto res2 = expr();
 			PFW_TRY(res2)
 			auto _2 = res2.value();
 			_0.AddChild(_2);
@@ -66,57 +214,9 @@ struct Parser : pfw::ParserBase<I, Lexer<I>, Token> {
 			
 			return _0;
 		}
-		return tl::unexpected(std::format("Unexpected token {}\n", this->cur_token.value()));
-	}
-	
-	Result<EpNode> Ep(int acc) {
-		EpNode _0;
-		if (this->template Expect<PLUS>()) {
-			PFW_TRY(this->template Expect<PLUS>())
-			auto _1 = _TokenNode(cur_token.value());
-			_0.AddChild(_1);
-			NextToken();
-			
-			auto res2 = T();
-			PFW_TRY(res2)
-			auto _2 = res2.value();
-			_0.AddChild(_2);
-			
-			auto res3 = Ep(acc + _2.val);
-			PFW_TRY(res3)
-			auto _3 = res3.value();
-			_0.AddChild(_3);
-			
-			_0.val = _3.val;
-			
-			return _0;
-		}
-		if (this->template Expect<RPAREN>() || this->template Expect<END>()) {
-			_0.val = acc;
-			
-			return _0;
-		}
-		return tl::unexpected(std::format("Unexpected token {}\n", this->cur_token.value()));
-	}
-	
-	Result<ENode> E() {
-		ENode _0;
-		if (this->template Expect<LPAREN>() || this->template Expect<NUM>()) {
-			auto res1 = T();
-			PFW_TRY(res1)
-			auto _1 = res1.value();
-			_0.AddChild(_1);
-			
-			auto res2 = Ep(_1.val);
-			PFW_TRY(res2)
-			auto _2 = res2.value();
-			_0.AddChild(_2);
-			
-			_0.val = _2.val;
-			
-			return _0;
-		}
-		return tl::unexpected(std::format("Unexpected token {}\n", this->cur_token.value()));
+		
+		PFW_TRY(cur_token)
+		return tl::unexpected(std::format("Unexpected token {}\n", cur_token.value()));
 	}
 	
 };

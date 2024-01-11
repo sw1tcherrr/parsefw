@@ -4,12 +4,15 @@
 
 namespace calc {
 
-PFW_TOKEN(NUM, R"([0-9]+)")
-PFW_TOKEN(RPAREN, R"(\))")
-PFW_TOKEN(LPAREN, R"(\()")
 PFW_TOKEN(PLUS, R"(\+)")
+PFW_TOKEN(MINUS, R"(\-)")
+PFW_TOKEN(MUL, R"(\*)")
+PFW_TOKEN(DIV, R"(\/)")
+PFW_TOKEN(LPAREN, R"(\()")
+PFW_TOKEN(RPAREN, R"(\))")
+PFW_TOKEN(NUM, R"([0-9]+)")
 using END = pfw::token::END;
 
-using Token = pfw::token::TokenType<NUM,RPAREN,LPAREN,PLUS>;
+using Token = pfw::token::TokenType<PLUS,MINUS,MUL,DIV,LPAREN,RPAREN,NUM>;
 
 } // namespace calc
